@@ -13,11 +13,7 @@ Das Projekt soll eine vollständige Cloud-Architektur bereitstellen, die als Erw
 Bereits vorhanden ist das COV3-Projekt: eine lokale Anwendung zur Echtzeit-Übungserkennung und Wiederholungszählung mittels MediaPipe. Neu entwickelt werden eine Cloud-API zur Datenerfassung, eine zentrale Datenbank zur Speicherung der Trainingshistorie, ein Dashboard zur Visualisierung sowie eine ChatGPT-Integration zur Erstellung individueller Trainingspläne.
 
 ## High-Level Architektur
-
-
-
 <img src="diagramm-4x.png" alt="Cloud Architektur" width="600" height="400">
-
 
 ```mermaid
 flowchart LR
