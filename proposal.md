@@ -14,28 +14,27 @@ Bereits vorhanden ist COV3: lokale Übungserkennung und Wiederholungszählung. N
 
 ## High-Level Architektur
 
-<img src="diagramm-4x-2.png" alt="Cloud Architektur" width="600" height="400">
-
 ```mermaid
 flowchart LR
-  subgraph Client (Mobile Web-App)
-    PWA[PWA: Kamera + Pose (on-device) + Rep-Zähler] -- events(JSON) --> APIGW
-    PWA <-- auth/OIDC --> AUTH[Auth Provider]
-    PWA <-- WebSocket/SSE --> RT[Realtime API]
+  subgraph Client ["Client (Mobile Web-App)"]
+    PWA["PWA: Kamera + Pose (on-device) + Rep-Zaehler"] -->|events JSON| APIGW
+    PWA <-->|auth OIDC| AUTH["Auth Provider"]
+    PWA <-->|WebSocket SSE| RT["Realtime API"]
   end
 
   subgraph Cloud
-    APIGW[API Gateway] --> BE[FastAPI on Cloud Run]
-    BE --> DB[(SQL/Firestore)]
-    BE --> BUS[(Pub/Sub/EventBridge)]
-    BE --> OBJ[Object Storage]
-    BUS --> DWH[(BigQuery/Analytics)]
-    DWH --> DASH[Dashboard Service]
-    BE --> GPT[ChatGPT API]
-    REG[Model Registry] --> BE
+    APIGW["API Gateway"] --> BE["FastAPI on Cloud Run"]
+    BE --> DB["SQL / Firestore"]
+    BE --> BUS["PubSub / EventBridge"]
+    BE --> OBJ["Object Storage"]
+    BUS --> DWH["BigQuery / Analytics"]
+    DWH --> DASH["Dashboard Service"]
+    BE --> GPT["ChatGPT API"]
+    REG["Model Registry"] --> BE
   end
 
   PWA <--> DASH
+
 ```
 
 ## Bezug zu Cloud Computing
