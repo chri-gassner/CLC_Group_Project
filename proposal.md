@@ -13,7 +13,9 @@ Das Projekt soll eine vollständige Cloud-Architektur bereitstellen, die als Erw
 Bereits vorhanden ist COV3: lokale Übungserkennung und Wiederholungszählung. Neu entstehen eine **Progressive Web App (PWA)** für mobile Erfassung, ein skalierbares Cloud-Backend mit Auth, Storage und Analytics sowie eine KI-Schicht für Plan-Generierung. Die PWA nutzt MediaPipe Tasks im Browser (oder TF.js MoveNet) für on-device Pose; alternativ kann ein Server-Endpunkt Frames/Keypoints verarbeiten.
 
 ## High-Level Architektur
+
 <img src="diagramm-4x-2.png" alt="Cloud Architektur" width="600" height="400">
+
 ```mermaid
 flowchart LR
   subgraph Client (Mobile Web-App)
