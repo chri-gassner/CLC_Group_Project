@@ -14,6 +14,8 @@ Bereits vorhanden ist das COV3-Projekt: eine lokale Anwendung zur Echtzeit-Übun
 
 ## High-Level Architektur
 
+![Architektur-Diagramm](diagram-4x.png)
+
 ```mermaid
 flowchart LR
   subgraph Edge
