@@ -2,7 +2,7 @@
 
 ## Ziel des Projekts
 
-Das Ziel dieses Projekts ist die Entwicklung einer Cloud-basierten Webplattform, die Trainingsdaten aus dem bestehenden COV3-Fitness-Tracker zentral sammelt, speichert, analysiert und visuell aufbereitet. Durch die Integration einer KI-Komponente werden personalisierte Trainingspläne erstellt, die sich dynamisch an die Leistungsdaten des Nutzers anpassen. Das System verbindet lokale Datenerfassung mit Cloud-gestützter Verarbeitung und Analyse, um ein skalierbares, intelligentes Fitness-Ökosystem zu schaffen.
+Das Ziel ist eine Cloud-basierte **Web-App** für mobiles Fitness-Tracking. Der Nutzer filmt sich direkt mit dem Smartphone-Browser, die Pose-Erkennung läuft vorzugsweise **on-device** in der Web-App, Wiederholungen werden lokal gezählt und Ereignisse in Echtzeit an die Cloud gesendet. Die Plattform speichert die Historie, analysiert Fortschritte und erzeugt KI-gestützte Trainingspläne.
 
 ## High-Level Ziel
 
@@ -10,36 +10,35 @@ Das Projekt soll eine vollständige Cloud-Architektur bereitstellen, die als Erw
 
 ## Neuerungen und bestehende Komponenten
 
-Bereits vorhanden ist das COV3-Projekt: eine lokale Anwendung zur Echtzeit-Übungserkennung und Wiederholungszählung mittels MediaPipe. Neu entwickelt werden eine Cloud-API zur Datenerfassung, eine zentrale Datenbank zur Speicherung der Trainingshistorie, ein Dashboard zur Visualisierung sowie eine ChatGPT-Integration zur Erstellung individueller Trainingspläne.
+Bereits vorhanden ist COV3: lokale Übungserkennung und Wiederholungszählung. Neu entstehen eine **Progressive Web App (PWA)** für mobile Erfassung, ein skalierbares Cloud-Backend mit Auth, Storage und Analytics sowie eine KI-Schicht für Plan-Generierung. Die PWA nutzt MediaPipe Tasks im Browser (oder TF.js MoveNet) für on-device Pose; alternativ kann ein Server-Endpunkt Frames/Keypoints verarbeiten.
 
 ## High-Level Architektur
-<img src="diagramm-4x.png" alt="Cloud Architektur" width="600" height="400">
 
 ```mermaid
 flowchart LR
-  subgraph Edge
-    A[Edge Device COV3: Kamera + Pose-Erkennung] -->|JSON: Übungen, Wiederholungen| B[API Gateway]
+  subgraph Client (Mobile Web-App)
+    PWA[PWA: Kamera + Pose (on-device) + Rep-Zähler] -- events(JSON) --> APIGW
+    PWA <-- auth/OIDC --> AUTH[Auth Provider]
+    PWA <-- WebSocket/SSE --> RT[Realtime API]
   end
 
   subgraph Cloud
-    B --> C[FastAPI Backend]
-    C --> D[Cloud Storage\nRohdaten, Logs]
-    C --> E[(SQL / Firestore Datenbank\nNutzer, Sessions)]
-    C --> F[ChatGPT API\nTrainingsplan-Generierung]
-    E --> G[BigQuery / Analytics Layer]
-    G --> H[Web-Dashboard\nReact / Streamlit]
+    APIGW[API Gateway] --> BE[FastAPI on Cloud Run]
+    BE --> DB[(SQL/Firestore)]
+    BE --> BUS[(Pub/Sub/EventBridge)]
+    BE --> OBJ[Object Storage]
+    BUS --> DWH[(BigQuery/Analytics)]
+    DWH --> DASH[Dashboard Service]
+    BE --> GPT[ChatGPT API]
+    REG[Model Registry] --> BE
   end
 
-  subgraph User
-    H -->|Darstellung, Planung, Analyse| U[Browser / Mobile]
-  end
+  PWA <--> DASH
 ```
-
-
 
 ## Bezug zu Cloud Computing
 
-Das Projekt nutzt Cloud-Technologien auf mehreren Ebenen. Über **Cloud Run** (bzw. AWS Lambda) wird ein serverloses Backend betrieben, das Skalierbarkeit und geringe Wartungskosten ermöglicht. **Cloud Storage** dient zur sicheren Ablage von Nutzerdaten, **BigQuery** bzw. eine vergleichbare Analytik-Plattform übernimmt die Aggregation und Auswertung der Trainingshistorie. Über **APIs** werden KI-Modelle (ChatGPT) in den Workflow integriert, um die Analysedaten für personalisierte Trainingsvorschläge zu nutzen. Das Frontend wird auf einer Cloud-Plattform (z. B. Firebase Hosting oder Vercel) bereitgestellt. Damit erfüllt das Projekt zentrale Cloud-Computing-Prinzipien wie Elastizität, Verfügbarkeit, serverlose Architektur und datengetriebene Dienste.
+Die Lösung nutzt eine **PWA** mit WebRTC/Media Capture für die mobile Kamera, **on-device Inferenz** zur Latenz- und Kostensenkung und ein **serverloses Backend** (Cloud Run/Lambda) hinter einem API Gateway. Authentifizierung erfolgt über OIDC/Identity Provider. Ereignisse werden als **Event Stream** in Pub/Sub/EventBridge verarbeitet und in ein **Data Warehouse** (BigQuery) für Analytics geschrieben. **Object Storage** archiviert optionale Rohdaten. **Realtime**-Kanäle (WebSocket/SSE) liefern Live-Feedback. Eine **Model Registry** verwaltet Modellversionen, die **ChatGPT-API** generiert Trainingspläne. Das Frontend wird über Firebase Hosting/Vercel bereitgestellt.
 
 ## Milestones
 
