@@ -14,7 +14,10 @@ Bereits vorhanden ist das COV3-Projekt: eine lokale Anwendung zur Echtzeit-Übun
 
 ## High-Level Architektur
 
-![Architektur-Diagramm](diagram-4x.png)
+
+
+<img src="diagramm-4x.png" alt="Cloud Architektur" width="600" height="400">
+
 
 ```mermaid
 flowchart LR
