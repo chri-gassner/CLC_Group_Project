@@ -10,7 +10,7 @@ Konkret läuft die Bildverarbeitung (MediaPipe vs. OpenPose) lokal auf dem Gerä
 * **Wird neu gebaut:**
     * **Edge Client (Python/Docker):** Ein Container, der lokal auf dem Laptop läuft, die Webcam ausliest, die Pose erkennt und nur die *Metriken* (nicht das Video) an die Cloud sendet.
     * **Cloud API (FastAPI):** Ein Microservice in der Cloud, der die Metriken empfängt.
-    * **Cloud Dashboard (Streamlit):** Eine Webseite, die live anzeigt, welches Modell gerade besser performt (z.B. "MediaPipe ist 20% schneller als OpenPose").
+    * **Cloud Dashboard (Streamlit):** Eine Webseite, die live anzeigt, welches Modell gerade besser performt (z.B. "MediaPipe ist 20% schneller als OpenPose"), inklusive Dashboard mit darstellung verschiedenster Metriken der Machine Learning Modelle und verwendeten Cloud Ressourcen.
 
 ## 2. High-Level Architektur
 
