@@ -33,23 +33,23 @@ Wir nutzen eine **cloud-native Microservice-Architektur** auf Basis von Containe
 ```mermaid
 flowchart LR
   subgraph EDGE[Edge Device]
-    EC[Edge Client (Docker)\nMediaPipe/OpenPose Inference\nTelemetry: FPS, Latency, CPU, Confidence]
+    EC["Edge Client (Docker)<br/>MediaPipe/OpenPose Inference<br/>Telemetry: FPS, Latency, CPU, Confidence"]
   end
 
-  subgraph CLOUD[GCP (Serverless)]
-    API[Cloud Run: FastAPI Ingestion API\nAuth • Schema Validation • Rate Limit\nCloud Logging/Monitoring]
-    PS[Pub/Sub Topic\nBuffering • Retry • DLQ]
-    WRK[Cloud Run: Persist/Aggregation Worker\nNormalize • Window Aggregates]
-    FS[(Firestore\nRaw Telemetry + Aggregates)]
-    DASH[Cloud Run: Streamlit Dashboard\nLive Compare • Filters • Trends]
-    MON[Cloud Monitoring + Logging\nSLOs • Alerts • Traces (optional)]
+  subgraph CLOUD["GCP - Serverless"]
+    API["Cloud Run - FastAPI Ingestion API<br/>Auth, Schema Validation, Rate Limit<br/>Cloud Logging/Monitoring"]
+    PS["Pub/Sub Topic<br/>Buffering, Retry, DLQ"]
+    WRK["Cloud Run - Persist/Aggregation Worker<br/>Normalize, Window Aggregates"]
+    FS[("Firestore<br/>Raw Telemetry + Aggregates")]
+    DASH["Cloud Run - Streamlit Dashboard<br/>Live Compare, Filters, Trends"]
+    MON["Cloud Monitoring + Logging<br/>SLOs, Alerts, Traces optional"]
   end
 
-  EC -->|HTTPS JSON Telemetry| API
-  API -->|Publish message| PS
-  PS -->|Consume| WRK
-  WRK -->|Write| FS
-  FS -->|Read| DASH
+  EC -->|"HTTPS JSON Telemetry"| API
+  API -->|"Publish message"| PS
+  PS -->|"Consume"| WRK
+  WRK -->|"Write"| FS
+  FS -->|"Read"| DASH
   API --> MON
   WRK --> MON
   DASH --> MON
