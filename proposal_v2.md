@@ -30,6 +30,32 @@ Wir nutzen eine **cloud-native Microservice-Architektur** auf Basis von Containe
 
 ![alt text](image-1.png)
 
+```mermaid
+flowchart LR
+  subgraph EDGE[Edge Device]
+    EC[Edge Client (Docker)\nMediaPipe/OpenPose Inference\nTelemetry: FPS, Latency, CPU, Confidence]
+  end
+
+  subgraph CLOUD[GCP (Serverless)]
+    API[Cloud Run: FastAPI Ingestion API\nAuth • Schema Validation • Rate Limit\nCloud Logging/Monitoring]
+    PS[Pub/Sub Topic\nBuffering • Retry • DLQ]
+    WRK[Cloud Run: Persist/Aggregation Worker\nNormalize • Window Aggregates]
+    FS[(Firestore\nRaw Telemetry + Aggregates)]
+    DASH[Cloud Run: Streamlit Dashboard\nLive Compare • Filters • Trends]
+    MON[Cloud Monitoring + Logging\nSLOs • Alerts • Traces (optional)]
+  end
+
+  EC -->|HTTPS JSON Telemetry| API
+  API -->|Publish message| PS
+  PS -->|Consume| WRK
+  WRK -->|Write| FS
+  FS -->|Read| DASH
+  API --> MON
+  WRK --> MON
+  DASH --> MON
+```
+
+
 **Ablauf (vereinfacht):**
 1. Edge Client führt die Pose-Erkennung durch und erzeugt Telemetrie.
 2. Cloud API nimmt die Daten entgegen, validiert sie und protokolliert sie.
@@ -55,7 +81,44 @@ Das Projekt zeigt eine realistische **Edge-to-Cloud-Architektur**, wie sie in Io
   Nutzung von Cloud Logging und Cloud Monitoring zur Analyse von Latenzen, Fehlerquoten, Durchsatz und Ressourcenverbrauch.
 
 Die Cloud dient damit nicht nur als Hosting-Plattform, sondern als **zentrale Benchmarking-, Analyse- und Betriebsschicht**.
+### 3.1 Vorteile der eingesetzten Cloud-Technologien
 
+* **Elastische Skalierung für Edge-Telemetrie:**  
+  Cloud Run skaliert API, Worker und Dashboard automatisch mit der Anzahl aktiver Edge-Clients. Lastspitzen (z. B. parallele Benchmarks) werden ohne manuelles Provisioning abgefangen.
+
+* **Entkopplung und Ausfallsicherheit durch Messaging:**  
+  Durch eine asynchrone Ingestion (z. B. Pub/Sub) werden Dateneingang und Persistierung getrennt. Burst-Last, temporäre Ausfälle und Retries können robust behandelt werden, ohne dass Edge-Clients blockieren.
+
+* **Reproduzierbare und schnelle Deployments:**  
+  Containerisierung und Infrastructure-as-Code (Terraform) ermöglichen konsistente Umgebungen, versionierte Services und schnelle Iterationen – wichtig für experimentelle Benchmarks.
+
+* **Zentrale Beobachtbarkeit und Vergleichbarkeit:**  
+  Cloud Monitoring und Logging liefern einheitliche Metriken (Latenz, Fehlerquoten, Durchsatz) über alle Services hinweg und ermöglichen eine konsistente Bewertung der gesamten Edge-to-Cloud-Pipeline.
+
+* **Passendes Betriebs- und Kostenmodell:**  
+  Serverless-Services mit Scale-to-Zero minimieren Betriebskosten außerhalb von Testläufen und reduzieren den administrativen Aufwand gegenüber klassischen VM-Setups.
+
+---
+
+### 3.2 Schwierigkeiten und Grenzen des Ansatzes
+
+* **Mehr als „Container + Datenbank“ notwendig:**  
+  Ohne Messaging, Aggregation und sauberes Datenmodell skaliert die Architektur nicht sinnvoll. Ein Großteil der Komplexität liegt im **Betrieb** (Retries, Idempotenz, Monitoring), nicht im reinen Deployen eines Containers.
+
+* **Datenmodellierung und Abfrage-Limits von Firestore:**  
+  Firestore erfordert vordefinierte Abfragepfade und Indizes. Für Dashboards müssen Aggregationen (z. B. Zeitfenster, Modellvergleiche) explizit vorbereitet werden, sonst entstehen Performance- und Kostenprobleme.
+
+* **Benchmark-Verzerrungen durch Mess-Overhead:**  
+  Telemetrie-Erfassung, Serialisierung und Netzwerkübertragung beeinflussen selbst Latenz und FPS. Diese Effekte müssen explizit berücksichtigt und dokumentiert werden.
+
+* **Eventual Consistency und Duplikate:**  
+  Asynchrone Systeme können Events mehrfach zustellen. Persistierung muss idempotent sein (z. B. stabile Event-IDs), was die Implementierung komplexer macht.
+
+* **Security und Missbrauchsschutz:**  
+  Telemetrie-Endpunkte benötigen Authentifizierung, Quotas und Rate-Limits. Diese Aspekte sind für ein Benchmarking-Projekt leicht zu unterschätzen, aber essenziell.
+
+* **Kostenkontrolle bei hoher Ereignisfrequenz:**  
+  Hohe Telemetrie-Raten können zu vielen API-Aufrufen und Datenbank-Writes führen. Batching, Sampling und Aggregation sind notwendig, um Cloud-Kosten beherrschbar zu halten.
 ---
 
 ## 4. Meilensteine
