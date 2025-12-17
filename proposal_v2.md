@@ -5,7 +5,7 @@ Das Ziel ist die Entwicklung einer **hybriden Cloud-Plattform zur systematischen
 
 Konkret läuft die Bildverarbeitung (MediaPipe vs. OpenPose) lokal auf dem Gerät (Edge), um Bandbreite zu sparen, Latenz zu minimieren und Datenschutz zu gewährleisten. In die Cloud werden **ausschließlich strukturierte Analyse-Ergebnisse (Telemetrie)** wie Latenz, FPS, CPU-Last, Konfidenzwerte und Fehlerindikatoren übertragen. Diese werden zentral gespeichert, aggregiert und live visualisiert.
 
-Der zentrale Erkenntnisgewinn des Projekts besteht darin, **Performance- und Ressourcen-Trade-offs zwischen unterschiedlichen CV-Modellen quantitativ zu bewerten** und gleichzeitig zu demonstrieren, wie eine cloud-native Telemetrie-Architektur für Edge-AI-Anwendungen betrieben und skaliert werden kann.
+Der zentrale Erkenntnisgewinn des Projekts besteht darin, **Performance- und Ressourcen-Trade-offs zwischen unterschiedlichen CV-Modellen quantitativ zu bewerten** und gleichzeitig zu demonstrieren, wie eine **cloud-native Telemetrie-Architektur** für Edge-AI-Anwendungen betrieben und skaliert werden kann.
 
 ### Was wird neu gebaut vs. was existiert?
 * **Existiert:**  
