@@ -30,6 +30,8 @@ Die Speicherung erfolgt zentral in Firestore. Dadurch werden Vergleiche über Ze
 
 Alle Services werden containerisiert betrieben und unabhängig voneinander über eine CI/CD-Pipeline gebaut und deployed.
 
+
+  ```mermaid
 flowchart LR
   subgraph MONO[Ausgangslage: Monolith (lokal)]
     M[CV Benchmark App\nWebcam + Inferenz + Metriken + (lokal) Storage + UI]
@@ -63,45 +65,7 @@ flowchart LR
   CI -->|Push Images| REG
   REG -->|Deploy| ING
   REG -->|Deploy| DASH
-
-  ```
-flowchart LR
-  subgraph MONO[Ausgangslage: Monolith (lokal)]
-    M[CV Benchmark App\nWebcam + Inferenz + Metriken + (lokal) Storage + UI]
-  end
-
-  subgraph EDGE[Edge Device (lokal, Docker)]
-    EC[Edge Inference Client (Docker)\nMediaPipe / OpenPose\nRohmetriken: FPS, Latenz, CPU, Confidence\nKein Video-Upload]
-  end
-
-  subgraph CLOUD[Google Cloud (Serverless)]
-    ING[Ingestion Service (FastAPI)\nCloud Run\nValidierung - Auth (optional) - Rate Limit (optional)]
-    DB[(Firestore)\nRaw Telemetry + Aggregates]
-    DASH[Analytics & Dashboard (Streamlit)\nCloud Run\nAggregation - Vergleich - Visualisierung]
-    OBS[Cloud Logging/Monitoring\nMetriken - Logs - Alerts (optional)]
-  end
-
-  subgraph CICD[CI/CD]
-    CI[Pipeline (z.B. GitHub Actions)\nBuild - Test - Containerize - Deploy]
-    REG[(Container Registry)]
-  end
-
-  M -. Referenz Baseline .-> EC
-
-  EC -->|HTTPS JSON Telemetrie| ING
-  ING -->|Write Raw| DB
-  DB -->|Read| DASH
-
-  ING --> OBS
-  DASH --> OBS
-
-  CI -->|Push Images| REG
-  REG -->|Deploy| ING
-  REG -->|Deploy| DASH
-
-
-
-
+```
 ## 4. Vorteile der eingesetzten Cloud-Technologien
 
 Der Einsatz von Cloud-Technologien bringt in diesem Szenario einen klaren Mehrwert. Durch die serverlose Ausführung auf Cloud Run ist keine manuelle Infrastrukturverwaltung notwendig, während gleichzeitig automatische Skalierung und Ausfallsicherheit gewährleistet sind. Mehrere Edge-Clients können parallel Benchmarks durchführen und ihre Ergebnisse zentral einspeisen, was mit dem ursprünglichen Monolithen nicht möglich wäre.
