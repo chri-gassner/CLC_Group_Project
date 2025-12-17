@@ -88,7 +88,7 @@ Die Cloud dient damit nicht nur als Hosting-Plattform, sondern als **zentrale Be
   Durch eine asynchrone Ingestion (z. B. Pub/Sub) werden Dateneingang und Persistierung getrennt. Burst-Last, temporäre Ausfälle und Retries können robust behandelt werden, ohne dass Edge-Clients blockieren.
 
 * **Reproduzierbare und schnelle Deployments:**  
-  Containerisierung und Infrastructure-as-Code (Terraform) ermöglichen konsistente Umgebungen, versionierte Services und schnelle Iterationen – wichtig für experimentelle Benchmarks.
+  Containerisierung und Infrastructure-as-Code (Terraform) ermöglichen konsistente Umgebungen, versionierte Services und schnelle Iterationen, wichtig für experimentelle Benchmarks.
 
 * **Zentrale Beobachtbarkeit und Vergleichbarkeit:**  
   Cloud Monitoring und Logging liefern einheitliche Metriken (Latenz, Fehlerquoten, Durchsatz) über alle Services hinweg und ermöglichen eine konsistente Bewertung der gesamten Edge-to-Cloud-Pipeline.
