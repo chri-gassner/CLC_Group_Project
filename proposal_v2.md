@@ -1,143 +1,89 @@
-# Projektproposal: Cloud-Native CV Benchmarking Platform
+# Projektproposal: Scalable Cloud-Native CV Benchmarking Platform
 
-## 1. Ziel des Projekts
-Das Ziel ist die Entwicklung einer **hybriden Cloud-Plattform zur systematischen Evaluation und zum Vergleich von Computer-Vision-Modellen**. Wir verbinden ein lokal entwickeltes Modul zur Gesten- bzw. Übungserkennung (**Edge Computing**) mit einer cloudbasierten Analyse- und Visualisierungsschicht. Der Fokus liegt auf dem Vergleich von **MediaPipe vs. OpenPose** unter realistischen Edge-Bedingungen.
+## 1. Ziel des Projekts und Motivation
 
-Konkret läuft die Bildverarbeitung (MediaPipe vs. OpenPose) lokal auf dem Gerät (Edge), um Bandbreite zu sparen, Latenz zu minimieren und Datenschutz zu gewährleisten. In die Cloud werden **ausschließlich strukturierte Analyse-Ergebnisse (Telemetrie)** wie Latenz, FPS, CPU-Last, Konfidenzwerte und Fehlerindikatoren übertragen. Diese werden zentral gespeichert, aggregiert und live visualisiert.
+Das Kernziel ist die Entwicklung einer **hybriden Benchmarking-Plattform** für Computer-Vision-Modelle, die lokale Inferenz (**Edge Computing**) mit einer skalierbaren **Cloud-Analyse** verbindet.
 
-Der zentrale Erkenntnisgewinn des Projekts besteht darin, **Performance- und Ressourcen-Trade-offs zwischen unterschiedlichen CV-Modellen quantitativ zu bewerten** und gleichzeitig zu demonstrieren, wie eine **cloud-native Telemetrie-Architektur** für Edge-AI-Anwendungen betrieben und skaliert werden kann.
+Wir vergleichen dabei nicht nur die Performance von Modellen (MediaPipe vs. OpenPose), sondern erforschen primär, wie eine moderne **ereignisgesteuerte Architektur (Event-Driven Architecture)** für IoT-Daten aufgebaut sein muss.
 
-### Was wird neu gebaut vs. was existiert?
-* **Existiert:**  
-  * Die CV-Frameworks **OpenPose** und **MediaPipe** (aus dem CV-Kurs)  
-  * Google Cloud Services (**Cloud Run**, **Firestore**, **Cloud Monitoring**)
+### Erkenntnisgewinn & Technische Motivation
+Um über das bloße Speichern von Daten hinauszugehen, adressieren wir folgende Aspekte:
 
-* **Wird neu gebaut:**  
-  * **Edge Client (Python/Docker):**  
-    Ein lokaler Container, der Webcam-Daten verarbeitet, Pose-Erkennung durchführt und standardisierte Telemetrie (z. B. Latenz, FPS, CPU-Auslastung, Konfidenz) erzeugt. Es werden **keine Video- oder Bilddaten** an die Cloud übertragen.
-  * **Cloud API (FastAPI):**  
-    Ein Microservice zur validierten Entgegennahme der Telemetriedaten, inkl. Schema-Validierung, Session-IDs und Logging.
-  * **Asynchrone Ingestion-Komponente:**  
-    Entkopplung von Dateneingang und Persistierung (z. B. mittels Cloud-nativer Messaging-Mechanismen), um Robustheit, Retry-Fähigkeit und Skalierbarkeit zu gewährleisten.
-  * **Cloud Dashboard (Streamlit):**  
-    Eine Webanwendung, die live darstellt, welches Modell aktuell besser performt (z. B. „MediaPipe ist 20 % schneller als OpenPose“) und verschiedene Modell- sowie Cloud-Metriken visualisiert.
+* **Warum diese Cloud-Technologien? (Vorteile):**
+    * **Entkopplung & Skalierbarkeit:** Durch den Einsatz von **Google Pub/Sub** entkoppeln wir die Datenerfassung von der Verarbeitung. Das System wird robust gegen Lastspitzen (z.B. wenn tausende Clients gleichzeitig senden), da die Queue puffert.
+    * **Serverless Operations:** Die Nutzung von **Cloud Run** und **Cloud Functions** minimiert den administrativen Aufwand (NoOps) und ermöglicht ein "Pay-per-Use" Kostenmodell.
+    * **Managed Data:** Firestore bietet als NoSQL-Lösung die nötige Flexibilität für sich ändernde Metrik-Strukturen der ML-Modelle.
 
----
+* **Herausforderungen & Schwierigkeiten:**
+    * **Asynchrone Konsistenz:** Da Daten nicht synchron in die DB geschrieben werden ("Fire and Forget" an die Queue), entsteht "Eventual Consistency". Das Dashboard muss damit umgehen, dass Daten evtl. mit leichter Verzögerung sichtbar werden.
+    * **Latenz-Overhead:** Eine Schwierigkeit liegt darin, die Netzwerklatenz zwischen Edge und Cloud so gering zu halten, dass die Performancemessung der eigentlichen CV-Modelle nicht verfälscht wird.
 
 ## 2. High-Level Architektur
 
-Wir nutzen eine **cloud-native Microservice-Architektur** auf Basis von Containern mit klarer Trennung zwischen Edge-Verarbeitung, Ingestion, Persistierung und Visualisierung.
+Wir setzen auf eine asynchrone Microservice-Architektur, um "Enterprise Patterns" im kleinen Maßstab abzubilden.
 
 ```mermaid
 flowchart LR
-  subgraph EDGE[Edge Device]
-    EC["Edge Client (Docker)<br/>MediaPipe/OpenPose Inference<br/>Telemetry: FPS, Latency, CPU, Confidence"]
-  end
+  %% Styles definieren
+  classDef compute fill:#4285F4,stroke:#fff,color:#fff,rx:5;
+  classDef storage fill:#DB4437,stroke:#fff,color:#fff,rx:5;
+  classDef monitor fill:#F4B400,stroke:#fff,color:#fff,rx:5;
+  classDef edge fill:#0F9D58,stroke:#333,color:#fff,stroke-dasharray: 5 5,rx:5;
 
-  subgraph CLOUD["GCP - Serverless"]
-    API["Cloud Run - FastAPI Ingestion API<br/>Auth, Schema Validation, Rate Limit<br/>Cloud Logging/Monitoring"]
-    PS["Pub/Sub Topic<br/>Buffering, Retry, DLQ"]
-    WRK["Cloud Run - Persist/Aggregation Worker<br/>Normalize, Window Aggregates"]
-    FS[("Firestore<br/>Raw Telemetry + Aggregates")]
-    DASH["Cloud Run - Streamlit Dashboard<br/>Live Compare, Filters, Trends"]
-    MON["Cloud Monitoring + Logging<br/>SLOs, Alerts, Traces optional"]
-  end
+  %% Nodes
+  Client(Edge Client\nPython/Docker)
+  API(Ingestion API\nCloud Run)
+  Queue(Pub/Sub\nTopic)
+  Worker(Processor\nCloud Function)
+  DB[(Firestore\nNoSQL)]
+  Dash(Dashboard\nStreamlit)
 
-  EC -->|"HTTPS JSON Telemetry"| API
-  API -->|"Publish message"| PS
-  PS -->|"Consume"| WRK
-  WRK -->|"Write"| FS
-  FS -->|"Read"| DASH
-  API --> MON
-  WRK --> MON
-  DASH --> MON
+  %% Verbindungen
+  Client -- "1. Send JSON Metrics" --> API
+  API -- "2. Publish Message" --> Queue
+  Queue -- "3. Trigger" --> Worker
+  Worker -- "4. Write Data" --> DB
+  Dash -- "5. Read Analysis" --> DB
+
+  %% Klassen Zuweisung
+  class Client edge;
+  class API,Worker,Queue compute;
+  class DB storage;
+  class Dash monitor;
 ```
 
-
-**Ablauf (vereinfacht):**
-1. Edge Client führt die Pose-Erkennung durch und erzeugt Telemetrie.
-2. Cloud API nimmt die Daten entgegen, validiert sie und protokolliert sie.
-3. Asynchrone Weiterleitung zur Persistierung zur Entkopplung der Komponenten.
-4. Speicherung der Metriken in Firestore.
-5. Dashboard und Monitoring-Komponenten greifen lesend auf die Daten zu.
-
----
+### Architektur-Komponenten
+* **Edge Layer:** Ein Docker-Container führt die Bildverarbeitung lokal aus (Privatsphäre & Bandbreite) und extrahiert Metriken.
+* **Ingestion Layer:** Eine **FastAPI** auf **Cloud Run** dient als Eintrittstor.
+* **Messaging Layer (Neu):** **Pub/Sub** nimmt Nachrichten entgegen und puffert sie.
+* **Processing Layer (Neu):** Eine **Cloud Function** wird durch Pub/Sub getriggert, validiert die Daten und schreibt sie final in die Datenbank.
+* **Presentation Layer:** Ein **Streamlit** Dashboard visualisiert die Live-Daten.
 
 ## 3. Beziehung zu Cloud Computing
 
-Das Projekt zeigt eine realistische **Edge-to-Cloud-Architektur**, wie sie in IoT- und ML-Monitoring-Szenarien eingesetzt wird:
-
-* **Edge Computing:**  
-  Die rechenintensive CV-Inferenz erfolgt lokal am Gerät, um Latenz und Bandbreitenbedarf zu minimieren.
-* **Microservices:**  
-  API, Ingestion und Dashboard sind logisch getrennte Services und unabhängig skalierbar.
-* **Containerization:**  
-  Docker wird sowohl lokal (reproduzierbare CV-Umgebung) als auch in der Cloud (Deployment) eingesetzt.
-* **Serverless Computing:**  
-  Die Cloud-Komponenten laufen auf Google Cloud Run und skalieren automatisch bis auf Null.
-* **Observability & Monitoring:**  
-  Nutzung von Cloud Logging und Cloud Monitoring zur Analyse von Latenzen, Fehlerquoten, Durchsatz und Ressourcenverbrauch.
-
-Die Cloud dient damit nicht nur als Hosting-Plattform, sondern als **zentrale Benchmarking-, Analyse- und Betriebsschicht**.
-### 3.1 Vorteile der eingesetzten Cloud-Technologien
-
-* **Elastische Skalierung für Edge-Telemetrie:**  
-  Cloud Run skaliert API, Worker und Dashboard automatisch mit der Anzahl aktiver Edge-Clients. Lastspitzen (z. B. parallele Benchmarks) werden ohne manuelles Provisioning abgefangen.
-
-* **Entkopplung und Ausfallsicherheit durch Messaging:**  
-  Durch eine asynchrone Ingestion (z. B. Pub/Sub) werden Dateneingang und Persistierung getrennt. Burst-Last, temporäre Ausfälle und Retries können robust behandelt werden, ohne dass Edge-Clients blockieren.
-
-* **Reproduzierbare und schnelle Deployments:**  
-  Containerisierung und Infrastructure-as-Code (Terraform) ermöglichen konsistente Umgebungen, versionierte Services und schnelle Iterationen, wichtig für experimentelle Benchmarks.
-
-* **Zentrale Beobachtbarkeit und Vergleichbarkeit:**  
-  Cloud Monitoring und Logging liefern einheitliche Metriken (Latenz, Fehlerquoten, Durchsatz) über alle Services hinweg und ermöglichen eine konsistente Bewertung der gesamten Edge-to-Cloud-Pipeline.
-
-* **Passendes Betriebs- und Kostenmodell:**  
-  Serverless-Services mit Scale-to-Zero minimieren Betriebskosten außerhalb von Testläufen und reduzieren den administrativen Aufwand gegenüber klassischen VM-Setups.
-
----
-
-### 3.2 Schwierigkeiten und Grenzen des Ansatzes
-
-* **Mehr als „Container + Datenbank“ notwendig:**  
-  Ohne Messaging, Aggregation und sauberes Datenmodell skaliert die Architektur nicht sinnvoll. Ein Großteil der Komplexität liegt im **Betrieb** (Retries, Idempotenz, Monitoring), nicht im reinen Deployen eines Containers.
-
-* **Datenmodellierung und Abfrage-Limits von Firestore:**  
-  Firestore erfordert vordefinierte Abfragepfade und Indizes. Für Dashboards müssen Aggregationen (z. B. Zeitfenster, Modellvergleiche) explizit vorbereitet werden, sonst entstehen Performance- und Kostenprobleme.
-
-* **Benchmark-Verzerrungen durch Mess-Overhead:**  
-  Telemetrie-Erfassung, Serialisierung und Netzwerkübertragung beeinflussen selbst Latenz und FPS. Diese Effekte müssen explizit berücksichtigt und dokumentiert werden.
-
-* **Eventual Consistency und Duplikate:**  
-  Asynchrone Systeme können Events mehrfach zustellen. Persistierung muss idempotent sein (z. B. stabile Event-IDs), was die Implementierung komplexer macht.
-
-* **Security und Missbrauchsschutz:**  
-  Telemetrie-Endpunkte benötigen Authentifizierung, Quotas und Rate-Limits. Diese Aspekte sind für ein Benchmarking-Projekt leicht zu unterschätzen, aber essenziell.
-
-* **Kostenkontrolle bei hoher Ereignisfrequenz:**  
-  Hohe Telemetrie-Raten können zu vielen API-Aufrufen und Datenbank-Writes führen. Batching, Sampling und Aggregation sind notwendig, um Cloud-Kosten beherrschbar zu halten.
----
+Das Projekt demonstriert wesentliche Cloud-Paradigmen:
+* **Event-Driven Architecture:** Nutzung von Message Queues zur Systementkopplung statt direkter HTTP-Calls an die Datenbank.
+* **FaaS (Function as a Service):** Granulare Verarbeitung von Events durch Cloud Functions (Trigger-based).
+* **Infrastructure as Code (IaC):** Bereitstellung der Infrastruktur (Topics, Services, IAM) via Terraform.
+* **Edge Computing:** Verlagerung rechenintensiver Aufgaben auf den Client zur Latenzminimierung.
 
 ## 4. Meilensteine
 
-Start der Implementierung nach der Proposal-Abnahme (Weihnachtsferien/Jänner).
+Start der Implementierung nach der Proposal-Abnahme.
 
-| Meilenstein | Beschreibung & Ziel | Deadline (Intern) |
+| Meilenstein | Beschreibung & Ziel | Deadline |
 | :--- | :--- | :--- |
-| **M1: Cloud Setup** | GCP-Projekt, Terraform-Basis, IAM und Container Registry eingerichtet. | 30.12.2025 |
-| **M2: Ingestion Service** | FastAPI-Service mit Schema-Validierung, Authentifizierung und strukturiertem Logging. | 07.01.2026 |
-| **M3: Dashboard Skeleton** | Streamlit-App visualisiert Dummy-Daten, Vergleichs-Layout steht. | 14.01.2026 |
-| **M4: Integration & Metrics** | Edge-Client sendet reale Telemetrie (FPS, Latenz, CPU). | 21.01.2026 |
-| **M5: Cloud Monitoring** | Einbindung von Cloud-Metriken, Test mit mehreren parallelen Edge-Clients. | 28.01.2026 |
-| **M6: Finalisierung** | Dokumentation, Benchmark-Auswertung und Präsentationsvorbereitung. | 31.01.2026 |
-
----
+| **M1: Cloud Infra** | Terraform Setup für Cloud Run, Pub/Sub und Firestore steht. | 30.12.2025 |
+| **M2: Ingestion Pipeline** | FastAPI nimmt Daten an -> pusht in Pub/Sub -> Cloud Function schreibt in Firestore. (Durchstich der Pipeline). | 07.01.2026 |
+| **M3: Dashboard V1** | Streamlit visualisiert Daten aus Firestore. Basis-Layout für Modell-Vergleich steht. | 14.01.2026 |
+| **M4: Edge Integration** | Der lokale CV-Client sendet echte Live-Metriken (FPS, Latenz) an die Cloud Pipeline. | 21.01.2026 |
+| **M5: Monitoring & Polish** | Alerting für Latenz-Spikes (Cloud Monitoring). Code Cleanup und Dokumentation. | 28.01.2026 |
+| **M6: Finalisierung** | Abschlusspräsentation und Demo. | 31.01.2026 |
 
 ## 5. Aufgabenverteilung
 
 | Teammitglied | Rolle | Verantwortungsbereich |
 | :--- | :--- | :--- |
-| **Christoph** | **Cloud Backend** | FastAPI, Telemetrie-Schema, Ingestion-Logik, Cloud-Run-Deployment |
-| **Simon** | **Infra & Data** | Firestore, Terraform, IAM, Monitoring und Logging |
-| **Marco** | **Edge & Viz** | CV-Integration (OpenPose/MediaPipe), Edge-Telemetrie, Streamlit-Dashboard |
+| **Christoph** | **Cloud Architecture** | Aufbau der **Ingestion API** (Cloud Run) und Konfiguration von **Pub/Sub**. |
+| **Simon** | **Backend Logic & Data** | Implementierung der **Cloud Function** (Message Processing), Firestore-Design und Terraform. |
+| **Marco** | **Edge & Visualization** | Entwicklung des lokalen **CV-Containers** und Aufbau des **Streamlit Dashboards**. |
