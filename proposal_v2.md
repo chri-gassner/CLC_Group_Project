@@ -28,8 +28,6 @@ Der zentrale Erkenntnisgewinn des Projekts besteht darin, **Performance- und Res
 
 Wir nutzen eine **cloud-native Microservice-Architektur** auf Basis von Containern mit klarer Trennung zwischen Edge-Verarbeitung, Ingestion, Persistierung und Visualisierung.
 
-![alt text](image-1.png)
-
 ```mermaid
 flowchart LR
   subgraph EDGE[Edge Device]
