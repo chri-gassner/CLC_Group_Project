@@ -1,18 +1,26 @@
 # Projektproposal: Scalable Cloud-Native CV Benchmarking Platform
 
-## 1. Ziel des Projekts
-Das Ziel ist die Entwicklung einer hybriden Benchmarking-Plattform für Computer-Vision-Modelle. Wir verbinden ein lokales Edge-Modul, das Gesten/Übungen erkennt (Vergleich MediaPipe vs. OpenPose), mit einer Cloud-native Analyse-Pipeline.
+## 1. Ziel des Projekts und Motivation
 
-### Architektur-Komponenten
-* **Edge Layer:** Ein Docker-Container führt die Bildverarbeitung lokal aus (Privatsphäre & Bandbreite) und extrahiert Metriken.
-* **Ingestion Layer:** Eine **FastAPI** auf **Cloud Run** nimmt Daten entgegen.
-* **Messaging Layer (Neu):** **Pub/Sub** puffert die eingehenden Nachrichten asynchron.
-* **Processing Layer (Neu):** Eine **Cloud Function** wird durch Pub/Sub getriggert, validiert die Daten und schreibt sie in die Datenbank.
-* **Presentation Layer:** Ein **Streamlit** Dashboard visualisiert die Performance-Unterschiede live.
+Das Kernziel ist die Entwicklung einer **hybriden Benchmarking-Plattform** für Computer-Vision-Modelle, die lokale Inferenz (**Edge Computing**) mit einer skalierbaren **Cloud-Analyse** verbindet.
+
+Wir vergleichen dabei nicht nur die Performance von Modellen (MediaPipe vs. OpenPose), sondern erforschen primär, wie eine moderne **ereignisgesteuerte Architektur (Event-Driven Architecture)** für IoT-Daten aufgebaut sein muss.
+
+### Erkenntnisgewinn & Technische Motivation
+Um über das bloße Speichern von Daten hinauszugehen, adressieren wir folgende Aspekte:
+
+* **Warum diese Cloud-Technologien? (Vorteile):**
+    * **Entkopplung & Skalierbarkeit:** Durch den Einsatz von **Google Pub/Sub** entkoppeln wir die Datenerfassung von der Verarbeitung. Das System wird robust gegen Lastspitzen (z.B. wenn tausende Clients gleichzeitig senden), da die Queue puffert.
+    * **Serverless Operations:** Die Nutzung von **Cloud Run** und **Cloud Functions** minimiert den administrativen Aufwand (NoOps) und ermöglicht ein "Pay-per-Use" Kostenmodell.
+    * **Managed Data:** Firestore bietet als NoSQL-Lösung die nötige Flexibilität für sich ändernde Metrik-Strukturen der ML-Modelle.
+
+* **Herausforderungen & Schwierigkeiten:**
+    * **Asynchrone Konsistenz:** Da Daten nicht synchron in die DB geschrieben werden ("Fire and Forget" an die Queue), entsteht "Eventual Consistency". Das Dashboard muss damit umgehen, dass Daten evtl. mit leichter Verzögerung sichtbar werden.
+    * **Latenz-Overhead:** Eine Schwierigkeit liegt darin, die Netzwerklatenz zwischen Edge und Cloud so gering zu halten, dass die Performancemessung der eigentlichen CV-Modelle nicht verfälscht wird.
 
 ## 2. High-Level Architektur
 
-Wir setzen auf eine asynchrone Microservice-Architektur.
+Wir setzen auf eine asynchrone Microservice-Architektur, um "Enterprise Patterns" im kleinen Maßstab abzubilden.
 
 ```mermaid
 flowchart LR
@@ -44,13 +52,20 @@ flowchart LR
   class Dash monitor;
 ```
 
+### Architektur-Komponenten
+* **Edge Layer:** Ein Docker-Container führt die Bildverarbeitung lokal aus (Privatsphäre & Bandbreite) und extrahiert Metriken.
+* **Ingestion Layer:** Eine **FastAPI** auf **Cloud Run** dient als Eintrittstor.
+* **Messaging Layer (Neu):** **Pub/Sub** nimmt Nachrichten entgegen und puffert sie.
+* **Processing Layer (Neu):** Eine **Cloud Function** wird durch Pub/Sub getriggert, validiert die Daten und schreibt sie final in die Datenbank.
+* **Presentation Layer:** Ein **Streamlit** Dashboard visualisiert die Live-Daten.
+
 ## 3. Beziehung zu Cloud Computing
 
-Das Projekt demonstriert moderne Cloud-Patterns:
-* **Event-Driven Architecture:** Nutzung von Message Queues (Pub/Sub) zur Systementkopplung.
-* **FaaS (Function as a Service):** Granulare Verarbeitung von Events durch Cloud Functions.
+Das Projekt demonstriert wesentliche Cloud-Paradigmen:
+* **Event-Driven Architecture:** Nutzung von Message Queues zur Systementkopplung statt direkter HTTP-Calls an die Datenbank.
+* **FaaS (Function as a Service):** Granulare Verarbeitung von Events durch Cloud Functions (Trigger-based).
 * **Infrastructure as Code (IaC):** Bereitstellung der Infrastruktur (Topics, Services, IAM) via Terraform.
-* **Edge Computing:** Verlagerung von rechenintensiven Aufgaben (CV Inferenz) auf den Client zur Latenzminimierung.
+* **Edge Computing:** Verlagerung rechenintensiver Aufgaben auf den Client zur Latenzminimierung.
 
 ## 4. Meilensteine
 
