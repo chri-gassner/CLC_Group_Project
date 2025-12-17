@@ -78,7 +78,7 @@ Start der Implementierung nach der Proposal-Abnahme.
 | **M3: Dashboard V1** | Streamlit visualisiert Daten aus Firestore. Basis-Layout für Modell-Vergleich steht. | 14.01.2026 |
 | **M4: Edge Integration** | Der lokale CV-Client sendet echte Live-Metriken (FPS, Latenz) an die Cloud Pipeline. | 21.01.2026 |
 | **M5: Monitoring & Polish** | Alerting für Latenz-Spikes (Cloud Monitoring). Code Cleanup und Dokumentation. | 28.01.2026 |
-| **M6: Finalisierung** | Abschlusspräsentation und Demo. | 31.01.2026 |
+| **M6: Finalisierung** | Abschlusspräsentation und Demo. | 02.02.2026 |
 
 ## 5. Aufgabenverteilung
 
