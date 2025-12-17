@@ -30,6 +30,48 @@ Die Speicherung erfolgt zentral in Firestore. Dadurch werden Vergleiche über Ze
 
 Alle Services werden containerisiert betrieben und unabhängig voneinander über eine CI/CD-Pipeline gebaut und deployed.
 
+```mermaid
+flowchart LR
+  %% From Monolith to Microservices (Edge + Cloud)
+  %% Paste into Markdown that supports Mermaid
+
+  subgraph MONO[Ausgangslage: Monolith (lokal)]
+    M[CV Benchmark App\nWebcam + Inferenz + Metriken + (lokal) Storage + UI]
+  end
+
+  subgraph EDGE[Edge Device (lokal, Docker)]
+    EC[Edge Inference Client (Docker)\nMediaPipe / OpenPose\nBerechnet Rohmetriken (FPS, Latenz, CPU, Confidence)\nKein Video-Upload]
+  end
+
+  subgraph CLOUD[Google Cloud (Serverless)]
+    ING[Ingestion Service (FastAPI)\nCloud Run\nValidierung • Auth (optional) • Rate Limit (optional)]
+    DB[(Firestore)\nRaw Telemetry + Aggregates]
+    DASH[Analytics & Dashboard (Streamlit)\nCloud Run\nAggregation • Vergleich • Visualisierung]
+    OBS[Cloud Logging/Monitoring\nMetriken • Logs • Alerts (optional)]
+  end
+
+  subgraph CICD[CI/CD]
+    CI[Pipeline (z.B. GitHub Actions)\nBuild • Test • Containerize • Deploy]
+    REG[(Container Registry)]
+  end
+
+  %% Monolith baseline relation (conceptual)
+  M -. Referenz/Baseline .-> EC
+
+  %% Data flow
+  EC -->|HTTPS JSON Telemetrie| ING
+  ING -->|Write (Raw)| DB
+  DB -->|Read| DASH
+
+  %% Observability
+  ING --> OBS
+  DASH --> OBS
+
+  %% CI/CD flows
+  CI -->|Push Images| REG
+  REG -->|Deploy| ING
+  REG -->|Deploy| DASH
+
 ---
 
 ## 4. Vorteile der eingesetzten Cloud-Technologien
