@@ -31,30 +31,29 @@ Die Speicherung erfolgt zentral in Firestore. Dadurch werden Vergleiche über Ze
 Alle Services werden containerisiert betrieben und unabhängig voneinander über eine CI/CD-Pipeline gebaut und deployed.
 
 
-  ```mermaid
+```mermaid
 flowchart LR
 
   subgraph MONO[Monolith]
-    M[CV Benchmark App\nWebcam + Inferenz + Metriken\nLokales Storage + UI]
+    M[CV Benchmark App<br/>Webcam + Inferenz + Metriken<br/>Lokales Storage + UI]
   end
 
   subgraph EDGE[Edge Device]
-    EC[Edge Inference Client (Docker)\nMediaPipe / OpenPose\nRohmetriken: FPS, Latenz, CPU, Confidence\nKein Video-Upload]
+    EC[Edge Inference Client Docker<br/>MediaPipe und OpenPose<br/>Rohmetriken: FPS, Latenz, CPU, Confidence<br/>Kein Video Upload]
   end
 
   subgraph CLOUD[Google Cloud]
-    ING[Ingestion Service\nFastAPI auf Cloud Run\nValidierung und Annahme]
-    DB[(Firestore)\nZentrale Metrik-Speicherung]
-    DASH[Analytics & Dashboard\nStreamlit auf Cloud Run\nAggregation und Visualisierung]
-    OBS[Cloud Monitoring\nLogs und Metriken]
+    ING[Ingestion Service<br/>FastAPI auf Cloud Run<br/>Annahme und Validierung]
+    DB[(Firestore<br/>Zentrale Metrik Speicherung)]
+    DASH[Analytics und Dashboard<br/>Streamlit auf Cloud Run<br/>Aggregation und Visualisierung]
+    OBS[Cloud Monitoring<br/>Logs und Metriken]
   end
 
-  subgraph CICD[CI/CD]
-    CI[Pipeline\nBuild - Test - Deploy]
+  subgraph CICD[CI CD]
+    CI[Pipeline<br/>Build - Test - Deploy]
     REG[(Container Registry)]
   end
 
-  %% Beziehungen
   M -. Referenz Baseline .-> EC
 
   EC -->|JSON Telemetrie| ING
