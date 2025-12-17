@@ -33,38 +33,40 @@ Alle Services werden containerisiert betrieben und unabhängig voneinander über
 
   ```mermaid
 flowchart LR
-  subgraph MONO[Ausgangslage: Monolith (lokal)]
-    M[CV Benchmark App\nWebcam + Inferenz + Metriken + (lokal) Storage + UI]
+
+  subgraph MONO[Monolith]
+    M[CV Benchmark App\nWebcam + Inferenz + Metriken\nLokales Storage + UI]
   end
 
-  subgraph EDGE[Edge Device (lokal, Docker)]
+  subgraph EDGE[Edge Device]
     EC[Edge Inference Client (Docker)\nMediaPipe / OpenPose\nRohmetriken: FPS, Latenz, CPU, Confidence\nKein Video-Upload]
   end
 
-  subgraph CLOUD[Google Cloud (Serverless)]
-    ING[Ingestion Service (FastAPI)\nCloud Run\nValidierung - Auth (optional) - Rate Limit (optional)]
-    DB[(Firestore)\nRaw Telemetry + Aggregates]
-    DASH[Analytics & Dashboard (Streamlit)\nCloud Run\nAggregation - Vergleich - Visualisierung]
-    OBS[Cloud Logging/Monitoring\nMetriken - Logs - Alerts (optional)]
+  subgraph CLOUD[Google Cloud]
+    ING[Ingestion Service\nFastAPI auf Cloud Run\nValidierung und Annahme]
+    DB[(Firestore)\nZentrale Metrik-Speicherung]
+    DASH[Analytics & Dashboard\nStreamlit auf Cloud Run\nAggregation und Visualisierung]
+    OBS[Cloud Monitoring\nLogs und Metriken]
   end
 
   subgraph CICD[CI/CD]
-    CI[Pipeline (z.B. GitHub Actions)\nBuild - Test - Containerize - Deploy]
+    CI[Pipeline\nBuild - Test - Deploy]
     REG[(Container Registry)]
   end
 
+  %% Beziehungen
   M -. Referenz Baseline .-> EC
 
-  EC -->|HTTPS JSON Telemetrie| ING
-  ING -->|Write Raw| DB
-  DB -->|Read| DASH
+  EC -->|JSON Telemetrie| ING
+  ING --> DB
+  DB --> DASH
 
   ING --> OBS
   DASH --> OBS
 
-  CI -->|Push Images| REG
-  REG -->|Deploy| ING
-  REG -->|Deploy| DASH
+  CI --> REG
+  REG --> ING
+  REG --> DASH
 ```
 ## 4. Vorteile der eingesetzten Cloud-Technologien
 
