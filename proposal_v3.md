@@ -71,10 +71,7 @@ flowchart LR
   CI -->|Push Images| REG
   REG -->|Deploy| ING
   REG -->|Deploy| DASH
-
----
-
-## 4. Vorteile der eingesetzten Cloud-Technologien
+```## 4. Vorteile der eingesetzten Cloud-Technologien
 
 Der Einsatz von Cloud-Technologien bringt in diesem Szenario einen klaren Mehrwert. Durch die serverlose Ausführung auf Cloud Run ist keine manuelle Infrastrukturverwaltung notwendig, während gleichzeitig automatische Skalierung und Ausfallsicherheit gewährleistet sind. Mehrere Edge-Clients können parallel Benchmarks durchführen und ihre Ergebnisse zentral einspeisen, was mit dem ursprünglichen Monolithen nicht möglich wäre.
 
