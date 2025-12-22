@@ -5,12 +5,7 @@
 ---
 
 # 1. Gesamtübersicht aller Arbeitspakete
-
 ## Projekt 1 – Gesture Recognition
-
-# Projekt 1 – Gesture Recognition  
-## Detaillierte Arbeitspakete mit Expected Output
-
 | ID | Arbeitspaket | Beschreibung | Abhängigkeiten | Expected Output |
 |----|-------------|--------------|----------------|-----------------|
 | P1-1 | Gesture-Definition | Festlegung von mindestens sechs klar unterscheidbaren Fitness-Gesten (statisch und/oder dynamisch), inklusive eindeutiger semantischer Bedeutung, Bewegungsablauf und Abgrenzung zueinander (z. B. Squat, Push-up, Jumping Jack). | – | Dokumentierte Gestenliste inkl. Beschreibung, Skizzen/Beispielbilder und Klassendefinition |
@@ -31,24 +26,26 @@
 ---
 
 ## Projekt 2 – Cloud Computing
+# Projekt 2 – Cloud-Native CV Benchmarking Platform  
+## Detaillierte Arbeitspakete mit Expected Output
 
-| ID | Arbeitspaket | Beschreibung | Abhängigkeiten |
-|----|-------------|-------------|----------------|
-| C2-1 | Architekturdesign | Cloud-Architektur + Diagramm | – |
-| C2-2 | API-Spezifikation | JSON-Metrik-Schema | C2-1 |
-| C2-3 | Edge-Service MediaPipe | Dockerisierte Inferenz | P1-3 |
-| C2-4 | Edge-Service OpenPose | Dockerisierte Inferenz | P1-4 |
-| C2-5 | Ingestion API | FastAPI auf Cloud Run | C2-2 |
-| C2-6 | Pub/Sub Setup | Topics, IAM | C2-1 |
-| C2-7 | Processing Function | Cloud Function → Firestore | C2-6 |
-| C2-8 | Firestore Schema | NoSQL Struktur | C2-2 |
-| C2-9 | Dashboard | Streamlit Visualisierung | C2-7, C2-8 |
-| C2-10 | IaC | Terraform Setup | C2-6 |
-| C2-11 | Benchmarking | Edge vs. Cloud | C2-3, C2-4, C2-7 |
-| C2-12 | GitHub Dokumentation | README & Setup | alle |
-| C2-13 | Tutorial | Reproduzierbarkeit | C2-12 |
-| C2-14 | Lessons Learned | Erkenntnisse | C2-11 |
-| C2-15 | Präsentation | Slides & Demo | alle |
+| ID | Arbeitspaket | Beschreibung | Abhängigkeiten | Expected Output |
+|----|-------------|--------------|----------------|-----------------|
+| C2-1 | Architekturdesign | Entwurf einer skalierbaren, ereignisgesteuerten Cloud-Architektur (Edge, Ingestion, Messaging, Processing, Storage, Presentation) inklusive klarer Komponentenabgrenzung. | – | Architekturdiagramm (z. B. Draw.io/Mermaid) + textuelle Architektur­beschreibung |
+| C2-2 | API-Spezifikation | Definition eines einheitlichen JSON-Schemas für Metriken (Latenz, FPS, Accuracy, Ressourcenverbrauch), inkl. Versionierung und Validierungsregeln. | C2-1 | Dokumentierte API-Spezifikation (Schema + Beispielpayloads) |
+| C2-3 | Edge-Service MediaPipe | Implementierung eines Docker-Containers für lokale MediaPipe-Inferenz inkl. Metrikerfassung und Versand an die Cloud. | P1-3 | Lauffähiger Docker-Container (MediaPipe Edge-Service) |
+| C2-4 | Edge-Service OpenPose | Implementierung eines Docker-Containers für lokale OpenPose-Inferenz inkl. Metrikerfassung und Versand an die Cloud. | P1-4 | Lauffähiger Docker-Container (OpenPose Edge-Service) |
+| C2-5 | Ingestion API | Entwicklung einer FastAPI als skalierbarer Entry Point auf Cloud Run zur Entgegennahme von Metrikdaten. | C2-2 | Deployed Cloud-Run-Service mit dokumentierten Endpunkten |
+| C2-6 | Pub/Sub Setup | Einrichtung von Google Pub/Sub Topics, Subscriptions und IAM-Rollen zur Entkopplung von Ingestion und Processing. | C2-1 | Funktionsfähige Pub/Sub-Infrastruktur |
+| C2-7 | Processing Function | Implementierung einer Cloud Function, die Pub/Sub Events verarbeitet, validiert und in Firestore persistiert. | C2-6 | Deployte Cloud Function mit erfolgreichem Firestore-Write |
+| C2-8 | Firestore Schema | Design einer flexiblen NoSQL-Datenstruktur zur Speicherung von Benchmark- und Inferenzmetriken. | C2-2 | Dokumentiertes Firestore-Datenmodell |
+| C2-9 | Dashboard | Entwicklung eines Streamlit-Dashboards zur Live-Visualisierung von Metriken (Latenz, FPS, Accuracy). | C2-7, C2-8 | Lauffähiges Dashboard mit Live- oder Near-Realtime-Daten |
+| C2-10 | IaC | Bereitstellung der Cloud-Infrastruktur mittels Terraform (Cloud Run, Pub/Sub, IAM). | C2-6 | Versioniertes Terraform-Setup inkl. `terraform apply` |
+| C2-11 | Benchmarking | Systematischer Vergleich von Edge- vs. Cloud-Verarbeitung sowie synchroner vs. asynchroner Architektur. | C2-3, C2-4, C2-7 | Benchmark-Report mit Tabellen und Diagrammen |
+| C2-12 | GitHub Dokumentation | Strukturierte Projektdokumentation inkl. Architektur, Setup, Build- und Run-Anleitung. | alle | Vollständiges GitHub-Repository mit README.md |
+| C2-13 | Tutorial | Schritt-für-Schritt-Anleitung zur Reproduzierbarkeit des gesamten Systems. | C2-12 | Reproduzierbares Tutorial (Markdown) |
+| C2-14 | Lessons Learned | Zusammenfassung technischer, architektonischer und organisatorischer Erkenntnisse. | C2-11 | Dokumentierte Lessons Learned Sektion |
+| C2-15 | Präsentation | Erstellung und Durchführung einer Abschlusspräsentation inkl. Live-Demo des Systems. | alle | Finale Präsentationsfolien + funktionierende Live-Demo |
 
 ---
 
