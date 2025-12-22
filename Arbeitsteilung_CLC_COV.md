@@ -8,22 +8,25 @@
 
 ## Projekt 1 – Gesture Recognition
 
-| ID | Arbeitspaket | Beschreibung | Abhängigkeiten |
-|----|-------------|-------------|----------------|
-| P1-1 | Gesture-Definition | Definition der ≥6 Fitness-Gesten | – |
-| P1-2 | Dataset-Analyse | Analyse des vorhandenen Datasets | P1-1 |
-| P1-3 | MediaPipe Pipeline | Keypoint-Extraktion & Features | P1-2 |
-| P1-4 | OpenPose Pipeline | Keypoint-Extraktion & Features | P1-2 |
-| P1-5 | Gesture-Labeling | Keypoints → Gestenklassen | P1-3, P1-4 |
-| P1-6 | ML-Modellwahl | Auswahl & Begründung | P1-5 |
-| P1-7 | Training MediaPipe | Training & Tuning | P1-6 |
-| P1-8 | Training OpenPose | Training & Tuning | P1-6 |
-| P1-9 | Rep-Counter Logik | Wiederholungszählung | P1-7, P1-8 |
-| P1-10 | Evaluation | Precision, Recall, Confusion | P1-7, P1-8 |
-| P1-11 | Framework-Vergleich | MediaPipe vs. OpenPose | P1-10 |
-| P1-12 | Paper (IEEE) | Wissenschaftliches Paper | P1-11 |
-| P1-13 | Demo | Live-Demo | P1-9 |
-| P1-14 | Präsentation | Slides & Vortrag | P1-12 |
+# Projekt 1 – Gesture Recognition  
+## Detaillierte Arbeitspakete mit Expected Output
+
+| ID | Arbeitspaket | Beschreibung | Abhängigkeiten | Expected Output |
+|----|-------------|--------------|----------------|-----------------|
+| P1-1 | Gesture-Definition | Festlegung von mindestens sechs klar unterscheidbaren Fitness-Gesten (statisch und/oder dynamisch), inklusive eindeutiger semantischer Bedeutung, Bewegungsablauf und Abgrenzung zueinander (z. B. Squat, Push-up, Jumping Jack). | – | Dokumentierte Gestenliste inkl. Beschreibung, Skizzen/Beispielbilder und Klassendefinition |
+| P1-2 | Dataset-Analyse | Analyse des vorhandenen Bild- bzw. Video-Datasets hinsichtlich Datenqualität, Klassenverteilung, Kameraperspektiven, Occlusions und Eignung für Keypoint-basierte Gestenerkennung. | P1-1 | Analysebericht (Statistiken, Class Balance, identifizierte Probleme) |
+| P1-3 | MediaPipe Pipeline | Implementierung einer vollständigen MediaPipe-basierten Pipeline zur Extraktion von Körper-Keypoints sowie Ableitung geeigneter Merkmale (z. B. Gelenkwinkel, Abstände, zeitliche Veränderungen). | P1-2 | Lauffähiger MediaPipe-Extraktor inkl. Feature-Vektoren pro Frame/Sequenz |
+| P1-4 | OpenPose Pipeline | Implementierung einer OpenPose-basierten Pipeline zur Extraktion von Körper-Keypoints und Feature-Engineering, analog zur MediaPipe-Pipeline, zur Gewährleistung fairer Vergleichbarkeit. | P1-2 | Lauffähiger OpenPose-Extraktor inkl. Feature-Vektoren pro Frame/Sequenz |
+| P1-5 | Gesture-Labeling | Zuordnung der extrahierten Keypoints und Feature-Sequenzen zu den definierten Gestenklassen; Erstellung konsistenter Labels für Training und Evaluation. | P1-3, P1-4 | Gelabelter Trainings- und Testdatensatz |
+| P1-6 | ML-Modellwahl | Auswahl geeigneter Klassifikationsmodelle (z. B. SVM, k-NN, LSTM) inklusive theoretischer Begründung basierend auf Datenstruktur, Temporalität und Komplexität der Gesten. | P1-5 | Dokumentierte Modellentscheidung inkl. Begründung |
+| P1-7 | Training MediaPipe | Training, Validierung und Hyperparameter-Tuning der ML-Modelle auf Basis der MediaPipe-Features; Analyse von Overfitting und Generalisierung. | P1-6 | Trainiertes MediaPipe-Modell inkl. gespeicherter Gewichte und Trainingslogs |
+| P1-8 | Training OpenPose | Training, Validierung und Hyperparameter-Tuning der ML-Modelle auf Basis der OpenPose-Features unter identischen Bedingungen wie bei MediaPipe. | P1-6 | Trainiertes OpenPose-Modell inkl. gespeicherter Gewichte und Trainingslogs |
+| P1-9 | Rep-Counter Logik | Entwicklung einer robusten Logik zur automatischen Wiederholungszählung von Fitnessübungen (z. B. Zustandsautomat oder Peak-Erkennung in Zeitreihen). | P1-7, P1-8 | Funktionierende Wiederholungszählung pro Übung |
+| P1-10 | Evaluation | Quantitative Evaluation der Modelle mittels Precision, Recall, Confusion Matrices und Accuracy für alle Gestenklassen. | P1-7, P1-8 | Evaluationsbericht inkl. Metriken und Confusion Matrices |
+| P1-11 | Framework-Vergleich | Systematischer Vergleich von MediaPipe und OpenPose hinsichtlich Erkennungsgenauigkeit, Latenz, Ressourcenverbrauch (CPU/RAM) und Stabilität. | P1-10 | Vergleichstabelle und Diagramme (Accuracy, FPS, Resource Usage) |
+| P1-12 | Paper (IEEE) | Erstellung eines wissenschaftlichen Papers im IEEE-Format inklusive Methodik, Ergebnissen, Diskussion und Ausblick. | P1-11 | Finales IEEE-konformes Paper (PDF) |
+| P1-13 | Demo | Umsetzung einer Live-Demo mit Webcam, Gestenerkennung und Wiederholungszählung zur praktischen Verifikation des Systems. | P1-9 | Lauffähige Live-Demo-Anwendung |
+| P1-14 | Präsentation | Erstellung und Durchführung einer strukturierten Präsentation (Slides + Vortrag) mit Fokus auf Motivation, Methodik, Ergebnisse und Live-Demo. | P1-12 | Finale Präsentationsfolien und gehaltene Präsentation |
 
 ---
 
