@@ -131,9 +131,9 @@ for dataset_name, csv_path in DATASETS.items():
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'model_benchmark_comparison.png'))
     print(f"Plot saved to {output_dir}")
-    plt.close() # Close plot to prevent overlap in next loop
+    plt.close() # Close to prevent overlap
 
-    # Feature Importance (RF)
+    # Feature Importance (RF only)
     rf_model = models["RandomForest"]
     importances = rf_model.feature_importances_
     feature_importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': importances})
