@@ -132,7 +132,7 @@ with mp_pose.Pose(
                 continue
 
             features["label"] = exercise
-            features["image"] = img_name
+            features["file"] = img_name
             rows.append(features)
 
 df = pd.DataFrame(rows)
