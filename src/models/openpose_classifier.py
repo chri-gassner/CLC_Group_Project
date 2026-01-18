@@ -6,7 +6,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, precision_recall_fscore_support
 import xgboost as xgb
 import joblib
 import time
@@ -15,10 +15,10 @@ import seaborn as sns
 import os
 
 DATASETS = {
-    'OpenPose': 'Project/openpose_pose_extraction/output/openpose_fitness_dataset.csv',
-    'MediaPipe': 'Project/mediapipe_pose_extraction/output/mediapipe_pose_dataset.csv' # Erstmal auskommentiert, falls Datei fehlt
+    'OpenPose': 'src/openpose_pose_extraction/output/openpose_fitness_dataset.csv',
+    'MediaPipe': 'src/mediapipe_pose_extraction/output/mediapipe_pose_dataset.csv'
 }
-BASE_OUTPUT_DIR = 'Project/models_output/'
+BASE_OUTPUT_DIR = 'src/models_output/'
 
 # Model Definitions
 models = {
@@ -124,6 +124,10 @@ for dataset_name, csv_path in DATASETS.items():
         inf_end = time.perf_counter()
         
         acc = accuracy_score(y_test, preds_encoded)
+        
+        precision, recall, f1, _ = precision_recall_fscore_support(
+            y_test, preds_encoded, average='weighted'
+        )
         total_inf_time_ms = (inf_end - inf_start) * 1000
         per_sample_ms = total_inf_time_ms / len(X_test)
         

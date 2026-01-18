@@ -7,11 +7,11 @@ import os
 # CONFIGURATION
 # ---------------------------------------------------------
 DATASETS = {
-    'OpenPose': 'Project/openpose_pose_extraction/output/openpose_fitness_dataset.csv',
-    'MediaPipe': 'Project/mediapipe_pose_extraction/output/mediapipe_pose_dataset.csv'
+    'OpenPose': 'src/openpose_pose_extraction/output/openpose_fitness_dataset.csv',
+    'MediaPipe': 'src/mediapipe_pose_extraction/output/mediapipe_pose_dataset.csv'
 }
 
-OUTPUT_DIR = 'Project/models_output/visualizations/'
+OUTPUT_DIR = 'src/models_output/visualizations/'
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ---------------------------------------------------------
