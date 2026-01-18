@@ -143,7 +143,12 @@ for dataset_name, csv_path in DATASETS.items():
         
         results.append({
             "Model": name,
+            "N_train": len(X),
+            "N_test": len(y),
             "Accuracy": acc,
+            "Precision_w": precision,
+            "Recall_w": recall,
+            "F1_w": f1,
             "Inference_Time_ms": per_sample_ms,
             "Training_Time_s": train_time
         })
