@@ -76,6 +76,9 @@ for dataset_name, csv_path in DATASETS.items():
     X = df.drop(['label', 'file'], axis=1)
     y = df['label']
 
+    feature_names = X.columns.tolist()
+    joblib.dump(feature_names, os.path.join(output_dir, "feature_names.pkl"))
+
     # Encode Labels
     le = LabelEncoder()
     y_encoded = le.fit_transform(y)

@@ -1,0 +1,54 @@
+src/
+├── edge/
+│   └── live_mediapipe_webcam.py
+├── mediapipe_pose_extraction/
+│   ├── Dockerfile
+│   ├── mediapipe_dataset_creation.py
+│   ├── output/
+│   │   └── mediapipe_pose_dataset.csv
+│   └── pose_features/
+│       ├── __pycache__/
+│       │   └── mediapipe_adapter.cpython-312.pyc
+│       ├── feature_extractor.py
+│       ├── geometry.py
+│       ├── mediapipe_adapter.py
+│       └── normalization.py
+├── models/
+│   └── openpose_classifier.py
+├── models_output/
+│   ├── MediaPipe/
+│   │   ├── benchmark_results.csv
+│   │   ├── feature_importance_rf.png
+│   │   ├── fitness_classifier_knn.pkl
+│   │   ├── fitness_classifier_mlp_neuralnet.pkl
+│   │   ├── fitness_classifier_randomforest.pkl
+│   │   ├── fitness_classifier_svm.pkl
+│   │   ├── fitness_classifier_xgboost.pkl
+│   │   ├── label_encoder.pkl
+│   │   ├── model_benchmark_comparison.png
+│   │   └── scaler.pkl
+│   ├── OpenPose/
+│   │   ├── benchmark_results.csv
+│   │   ├── feature_importance_rf.png
+│   │   ├── fitness_classifier_knn.pkl
+│   │   ├── fitness_classifier_mlp_neuralnet.pkl
+│   │   ├── fitness_classifier_randomforest.pkl
+│   │   ├── fitness_classifier_svm.pkl
+│   │   ├── fitness_classifier_xgboost.pkl
+│   │   ├── label_encoder.pkl
+│   │   ├── model_benchmark_comparison.png
+│   │   └── scaler.pkl
+│   └── visualizations/
+│       ├── visualization.py
+│       ├── viz_MediaPipe.png
+│       └── viz_OpenPose.png
+└── openpose_pose_extraction/
+    ├── Dockerfile
+    ├── openpose_dataset_creation.py
+    ├── output/
+    │   └── openpose_fitness_dataset.csv
+    └── pose_features/
+        └── __pycache__/
+            ├── feature_extractor.cpython-312.pyc
+            ├── geometry.cpython-312.pyc
+            └── openpose_adapter.cpython-312.pyc
