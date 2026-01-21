@@ -54,6 +54,16 @@ def compute_angle(a, b, c):
     cos_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc) + 1e-6)
     return np.degrees(np.arccos(np.clip(cos_angle, -1.0, 1.0)))
 
+def compute_inclination(shoulder_mid, hip_mid):
+    spine_vector = shoulder_mid - hip_mid
+    vertical_vector = np.array([0, -1]) 
+    
+    spine_norm = np.linalg.norm(spine_vector)
+    if spine_norm < 1e-6: return 0.0
+    
+    cos_angle = np.dot(spine_vector, vertical_vector) / spine_norm
+    return np.degrees(np.arccos(np.clip(cos_angle, -1.0, 1.0)))
+
 def normalize_skeleton(joints):
     hip_center = (joints["l_hip"] + joints["r_hip"]) / 2
     joints = {k: v - hip_center for k, v in joints.items()}
@@ -84,8 +94,13 @@ def extract_features(results):
         compute_angle(joints["r_shoulder"], joints["r_elbow"], joints["r_wrist"]),
     ]
 
-    for k in joints:
-        features.extend([joints[k][0], joints[k][1]])
+    torso_inclination = compute_inclination(
+        (joints["l_shoulder"] + joints["r_shoulder"]) / 2,
+        (joints["l_hip"] + joints["r_hip"]) / 2
+    )
+    features.append(torso_inclination)
+    # for k in joints:
+    #     features.extend([joints[k][0], joints[k][1]])
 
     return np.array(features).reshape(1, -1)
 

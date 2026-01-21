@@ -32,5 +32,9 @@ def extract_features(joints):
     features["elbow_angle_r"] = compute_angle(
         joints_norm["r_shoulder"], joints_norm["r_elbow"], joints_norm["r_wrist"]
     )
+    
+    for k, v in joints.items():
+        features[f"{k}_x"] = v[0]
+        features[f"{k}_y"] = v[1]
 
     return features
