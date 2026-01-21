@@ -99,8 +99,9 @@ def extract_features(results):
         (joints["l_hip"] + joints["r_hip"]) / 2
     )
     features.append(torso_inclination)
-    # for k in joints:
-    #     features.extend([joints[k][0], joints[k][1]])
+    
+    for k in joints:
+        features.extend([joints[k][0], joints[k][1]])
 
     return np.array(features).reshape(1, -1)
 
