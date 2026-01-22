@@ -4,7 +4,7 @@ Python: 3.13
 # Setup Project
 ## 1. Install Requirements
 ```bash
-pip install -r requirements.txt
+pip install -r src/requirements.txt
 ```
 
 ## 2. Download the Data
