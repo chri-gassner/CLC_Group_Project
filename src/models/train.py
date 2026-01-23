@@ -42,12 +42,12 @@ CONFIG = {
     "mode": "tabular",  # "tabular" | "sequence"
 
     # tabular
-    "input": "../data/mediapipe_dataset.csv",
+    "input": "../output/openpose_dataset_windows.csv",
 
     # sequence
-    "npz": "../output/mediapipe_pose_npz/dataset_windows.npz",
-    "meta": "../output/mediapipe_pose_npz/dataset_windows_meta.csv",
-    "labels": "../output/mediapipe_pose_npz/labels.csv",
+    "npz": "../output/openpose_pose_npz/dataset_windows.npz",
+    "meta": "../output/openpose_pose_npz/dataset_windows_meta.csv",
+    "labels": "../output/openpose_pose_npz/labels.csv",
 
     # outputs
     "out": "../output/models_output",
