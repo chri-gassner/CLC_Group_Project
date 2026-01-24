@@ -3,6 +3,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pandas as pd
+import requests
 from tqdm import tqdm
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -17,17 +18,17 @@ except ImportError:
     psutil = None
 
 # Config
-MANIFEST = "manifest.csv"
-OUT_DIR = Path("../output/mediapipe_pose_npz")
+MANIFEST = "src/extract_pose_mediapipe/manifest.csv"
+OUT_DIR = Path("src/output/mediapipe_pose_npz")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 FPS_TARGET = 15  # runter-samplen
 
 # Pfad zu deinem .task Modell
-MODEL_PATH = "pose_landmarker_heavy.task"
+MODEL_PATH = "src/extract_pose_mediapipe/pose_landmarker_heavy.task"
 
 # Logging setup
 RUN_ID = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
-METRICS_DIR = Path("../output/metrics/mediapipe")
+METRICS_DIR = Path("src/output/metrics/mediapipe")
 
 # create metrics dir
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
@@ -86,6 +87,48 @@ def _lm_to_arr(lm_list):
         arr[i, 3] = getattr(p, "visibility", np.nan)
         arr[i, 4] = getattr(p, "presence", np.nan)
     return arr
+
+def build_video_metrics(
+    video_path, label, fps, stride,
+    total_frames, ok_frames,
+    detect_rate, mean_vis, vis_p50, vis_p90,
+    nan_rate_img, wall_s, eff_fps,
+    mem0, mem1
+):
+    return {
+        "run_id": RUN_ID,
+        "ts_utc": now_iso(),
+
+        "model": "mediapipe_pose",
+        "model_variant": "heavy",
+
+        "video_path": video_path,
+        "label": label,
+
+        "fps_orig": fps,
+        "fps_target": FPS_TARGET,
+        "stride": stride,
+
+        "frames_total": total_frames,
+        "frames_ok": ok_frames,
+        "detect_rate": detect_rate,
+
+        "mean_visibility": mean_vis,
+        "vis_p50": vis_p50,
+        "vis_p90": vis_p90,
+        "nan_rate_xyz": nan_rate_img,
+
+        "wall_s": wall_s,
+        "eff_fps": eff_fps,
+
+        "mem_mb_start": mem0,
+        "mem_mb_end": mem1,
+
+        "hostname": socket.gethostname(),
+        "os": platform.system(),
+        "python": platform.python_version(),
+    }
+
 
 def extract_video(video_path: str, landmarker=None):
     cap = cv2.VideoCapture(video_path)
@@ -231,7 +274,7 @@ def main():
 
         try:
             (X_img, X_world, fps, stride, dr, mean_vis,
-             vis_p50, vis_p90, nan_rate_img, total_frames, ok_frames) = extract_video(video_path, landmarker=landmarker)
+             vis_p50, vis_p90, nan_rate_img, total_frames, ok_frames) = extract_video(video_path, landmarker=None)
 
             wall_s = time.perf_counter() - t0
             mem1 = proc_mem_mb()
@@ -271,7 +314,17 @@ def main():
                 "mem_mb_end": mem1,
                 "mem_mb_delta": (mem1 - mem0) if (mem0 is not None and mem1 is not None) else None,
             }
+
+            # minimal additions
+            rec["run_id"] = RUN_ID
+            rec["model"] = "mediapipe_pose"
+            rec["model_variant"] = "heavy"
+
             append_jsonl(RUN_LOG, rec)
+            try:
+                requests.post("http://127.0.0.1:8000/metrics", json=rec, timeout=2)
+            except Exception:
+                pass  # keep extraction running even if backend is down
 
             meta_rows.append({
                 "npz_path": str(out_path),
