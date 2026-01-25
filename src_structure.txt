@@ -1,0 +1,62 @@
+src/
+├── README.md
+├── backend/
+│   ├── README.md
+│   ├── __pycache__/
+│   │   └── main.cpython-312.pyc
+│   └── main.py
+├── data/
+│   ├── deadlift/
+│   │   ├── 0925f4eb-58fa-4e45-a6e7-e03265f0372d.mp4
+│   ├── hammer curl/
+│   │   ├── 025f35e2-102a-4f99-bca8-16cd509774f3.mp4
+│   ├── hip thrust/
+│   │   └── hip thrust_9.mp4
+│   ├── lateral raise/
+│   │   ├── 151b5c0d-0663-428e-9ee2-75c2f246ccd4.mp4
+│   ├── mediapipe_dataset.csv
+│   ├── pull Up/
+│   │   ├── 1824d061-48f8-4c65-8d95-67a871c14ab6.mp4
+│   ├── push-up/
+│   │   ├── 01b09356-3985-474f-827f-20c79cfcda78.mp4
+│   └── squat/
+│       ├── 010470ae-997d-4dec-ac14-0eb862466491.mp4
+├── demo/
+│   ├── demo_mediapipe_macos.py
+│   └── demo_mediapipe_panel_macos
+├── extract_pose_mediapipe/
+│   ├── build_feature_dataset_mediapipe.py
+│   ├── extract_pose_mediapipe.py
+│   ├── make_manifest.py
+│   ├── manifest.csv
+│   └── pose_landmarker_heavy.task
+├── extract_pose_openpose/
+│   ├── Dockerfile
+│   ├── build_feature_dataset_openpose.py
+│   ├── extract_pose_openpose.py
+│   └── manifest.csv
+├── mediapipe_pose_extraction/
+│   └── pose_features/
+│       └── __pycache__/
+│           ├── feature_extractor.cpython-312.pyc
+│           ├── geometry.cpython-312.pyc
+│           ├── mediapipe_adapter.cpython-312.pyc
+│           └── normalization.cpython-312.pyc
+├── models/
+│   ├── train.py
+│   └── train2.py
+├── openpose_pose_extraction/
+│   └── pose_features/
+│       └── __pycache__/
+│           ├── feature_extractor.cpython-312.pyc
+│           ├── geometry.cpython-312.pyc
+│           └── openpose_adapter.cpython-312.pyc
+├── output/
+│   ├── mediapipe_pose_npz/
+│   │   ├── deadlift__0925f4eb-58fa-4e45-a6e7-e03265f0372d.npz
+│   └── metrics/
+│       └── mediapipe/
+│           ├── pose_meta.csv
+│           ├── pose_run_2026-01-24_16-47-25.jsonl
+│           └── pose_summary_2026-01-24_15-14-38.csv
+└── requirements.txt
