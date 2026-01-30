@@ -1,0 +1,4 @@
+streamlit
+google-cloud-firestore
+pandas
+google-auth>=2.0.0
