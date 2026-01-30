@@ -323,7 +323,7 @@ def main():
             append_jsonl(RUN_LOG, rec)
             try:
                 # requests.post("http://127.0.0.1:8000/metrics", json=rec, timeout=2)
-                requests.post(os.getenv("INGESTION_API_KEY"), json=rec, timeout=2)
+                requests.post(os.getenv("INGESTION_API_URL"), json=rec, timeout=2)
             except Exception:
                 pass  # keep extraction running even if backend is down
 
