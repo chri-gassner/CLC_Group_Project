@@ -8,6 +8,9 @@ This section allows an external reviewer to reproduce the full system.
 
 This project implements a hybrid benchmarking platform designed to evaluate the performance of different Computer Vision models on edge devices. The system decouples local inference from cloud analysis using an **Event-Driven Architecture**.
 
+### Related Work / Research
+TODO
+
 **Key Features:**
 * **Edge Computing:** Local processing of video datasets using MediaPipe (and OpenPose).
 * **Event-Driven Ingestion:** High-throughput ingestion via Google Pub/Sub (decoupling producers from consumers).
@@ -249,3 +252,5 @@ Access is publicly available via HTTPS (unauthenticated).
 
 This setup allows full end-to-end reproducibility of the edge-to-cloud
 benchmarking pipeline without modifying application code.
+
+## Lessons learned
