@@ -16,21 +16,21 @@ Research consistently highlights that while Cloud AI offers superior computation
 
 Key Finding: Hybrid models that use the edge for inference and the cloud for analytical aggregation (as seen in this project) offer the most balanced performance for IoT-scale deployments.
 
-Source: Benchmarking Edge Computing vs. Cloud Computing for Real-Time Data Processing (2025)
+Source: [Benchmarking Edge Computing vs. Cloud Computing for Real-Time Data Processing (2025)](https://www.researchgate.net/publication/389356968_Benchmarking_Edge_Computing_vs_Cloud_Computing_for_Real-Time_Data_Processing)
 
 2. Event-Driven Architectures for Real-Time Analytics
 Modern IoT systems are moving away from direct database writes to Event-Driven Architectures (EDA). By using a message broker (like Pub/Sub) to decouple producers from consumers, systems achieve higher fault tolerance and scalability.
 
 Key Finding: Decoupling ensures that high-frequency telemetry from edge devices does not overwhelm the backend. Asynchronous communication allows the system to handle bursty workloads while maintaining a responsive user dashboard.
 
-Source: Event-Driven Architectures for Real-Time Data Processing: A Deep Dive (2025)
+Source: [Event-Driven Architectures for Real-Time Data Processing: A Deep Dive (2025)](https://www.researchgate.net/publication/391633680_Event-Driven_Architectures_for_Real-Time_Data_Processing_A_Deep_Dive_into_System_Design_and_Optimization)
 
 3. Cloud-Native Benchmarking Automation
 Traditional benchmarking is often manual and error-prone. Modern research suggests using "Benchmarking Operators" and containerized cloud-native environments to automate the collection of metrics across distributed nodes.
 
 Key Finding: Separating the ingestion (API) from the processing (Worker) ensures that the benchmarking system itself does not become a bottleneck for the edge devices, preserving the integrity of the performance data.
 
-Source: Cloud-Native-Bench: An Extensible Benchmarking Framework (2024)
+Source: [Cloud-Native-Bench: An Extensible Benchmarking Framework (2024)](https://ieeexplore.ieee.org/document/10490079)
 
 **Key Features:**
 * **Edge Computing:** Local processing of video datasets using MediaPipe (and OpenPose).
