@@ -37,13 +37,13 @@ To reproduce this project, ensure the following requirements are met:
         ```
 
 2.  **Python Environment:**
-    * Python 3.10+ (3.12 recommended for backend).
-    * **Important:** We strongly recommend using **separate virtual environments** for the *Backend* and the *Edge Client*. MediaPipe requires older `protobuf` versions, while Google Cloud libraries require newer ones.
+    * Python 3.12+
 
 3. **🔐 Environment Variables (Configuration):**
 
     This project uses environment variables to separate configuration from code.
 
+         TODO: Where put the file? In src? 
     All environment variables can be provided via:
     - a local `.env` file (for development)
 
@@ -56,7 +56,7 @@ To reproduce this project, ensure the following requirements are met:
 | `GOOGLE_CLOUD_PROJECT` | Backend, Worker, Dashboard | Identifies the GCP project |
 | `FIRESTORE_DATABASE` | Worker, Dashboard | Explicit non-default Firestore database |
 | `INGESTION_API_URL` | Edge Client | Base URL of the Ingestion API |
-
+TODO: ADD DOCKER ENV VARIABLES
 ---
 
 ## 🚀 Part 1: Cloud Infrastructure Setup
@@ -111,7 +111,6 @@ The API acts as a "Producer." It accepts JSON metrics via HTTP and pushes them t
 
 ### 2.1 Setup
 Create a virtual environment (e.g., .venv-backend) and install dependencies:
-
 ```bash
 pip install fastapi uvicorn google-cloud-pubsub
 ```
