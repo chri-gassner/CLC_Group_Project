@@ -9,7 +9,28 @@ This section allows an external reviewer to reproduce the full system.
 This project implements a hybrid benchmarking platform designed to evaluate the performance of different Computer Vision models on edge devices. The system decouples local inference from cloud analysis using an **Event-Driven Architecture**.
 
 ### Related Work / Research
-TODO
+This project builds upon existing research in distributed computer vision and event-driven architectures. Our platform addresses the "Edge-to-Cloud" data gap by implementing a decoupled, scalable pipeline.
+
+1. Edge vs. Cloud Trade-offs in Real-time AI
+Research consistently highlights that while Cloud AI offers superior computational resources, it suffers from network latency and bandwidth costs. Conversely, Edge computing excels in real-time processing and data privacy.
+
+Key Finding: Hybrid models that use the edge for inference and the cloud for analytical aggregation (as seen in this project) offer the most balanced performance for IoT-scale deployments.
+
+Source: Benchmarking Edge Computing vs. Cloud Computing for Real-Time Data Processing (2025)
+
+2. Event-Driven Architectures for Real-Time Analytics
+Modern IoT systems are moving away from direct database writes to Event-Driven Architectures (EDA). By using a message broker (like Pub/Sub) to decouple producers from consumers, systems achieve higher fault tolerance and scalability.
+
+Key Finding: Decoupling ensures that high-frequency telemetry from edge devices does not overwhelm the backend. Asynchronous communication allows the system to handle bursty workloads while maintaining a responsive user dashboard.
+
+Source: Event-Driven Architectures for Real-Time Data Processing: A Deep Dive (2025)
+
+3. Cloud-Native Benchmarking Automation
+Traditional benchmarking is often manual and error-prone. Modern research suggests using "Benchmarking Operators" and containerized cloud-native environments to automate the collection of metrics across distributed nodes.
+
+Key Finding: Separating the ingestion (API) from the processing (Worker) ensures that the benchmarking system itself does not become a bottleneck for the edge devices, preserving the integrity of the performance data.
+
+Source: Cloud-Native-Bench: An Extensible Benchmarking Framework (2024)
 
 **Key Features:**
 * **Edge Computing:** Local processing of video datasets using MediaPipe (and OpenPose).
@@ -252,4 +273,19 @@ Access is publicly available via HTTPS (unauthenticated).
 This setup allows full end-to-end reproducibility of the edge-to-cloud
 benchmarking pipeline without modifying application code.
 
-## Lessons learned
+## Lessons Learned
+The development of this benchmarking platform provided several key insights regarding security, data integrity, and container orchestration:
+
+1. Security and Authentication
+Authentication is Essential: Implementing robust authentication was critical for the secure communication between the edge clients and the Google Cloud backend. This ensures that only authorized metrics are ingested into the pipeline and prevents unauthorized access to the cloud infrastructure.
+
+2. Data Integrity and Comparison
+Standardized Metrics for Comparison: For a benchmarking platform to be effective, there must be a unified set of metrics across all tested models. Standardizing how performance is measured ensures that the comparison between different CV frameworks remains meaningful and consistent.
+
+3. Container Orchestration
+Path Management via Volume Mounts: Proper configuration of Volume Mounts is vital when working with containerized CV models. We learned that precise path management is necessary to ensure the containers can access local video datasets and write output logs without permission or directory errors.
+
+4. Protobuf Versioning & Dependency Isolation
+Managing Dependency Conflicts: We encountered significant "Dependency Hell" because MediaPipe requires older versions of protobuf, while the Google Cloud client libraries require the latest versions.
+
+The Microservices Solution: Decoupling the Edge Client from the Backend into separate virtual environments or Docker containers was the only viable way to resolve these conflicts without breaking core functionality.
