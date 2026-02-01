@@ -106,7 +106,7 @@ All components are configured exclusively via environment variables. Configurati
 
 ### Configuration Scopes
 
-* **Edge (Docker):** `env/common.env`, `env/mediapipe.env`, `env/openpose.env`
+* **Edge (Docker):** `src/src/env/common.env`, `src/src/env/mediapipe.env`, `src/src/env/openpose.env`
 * **Cloud:** injected at deploy time via `gcloud --set-env-vars`
 
 ### Required Variables
@@ -115,8 +115,8 @@ All components are configured exclusively via environment variables. Configurati
 
 | Variable      | Used by | Where            | Description                                       |
 | ------------- | ------- | ---------------- | ------------------------------------------------- |
-| `INGEST_URL`  | Edge    | `env/common.env` | Cloud Run ingestion endpoint including `/metrics` |
-| `SOURCE_NAME` | Edge    | `env/common.env` | Human-readable identifier for the run             |
+| `INGEST_URL`  | Edge    | `src/env/common.env` | Cloud Run ingestion endpoint including `/metrics` |
+| `SOURCE_NAME` | Edge    | `src/env/common.env` | Human-readable identifier for the run             |
 
 #### Deployment-only (Cloud)
 
@@ -323,19 +323,19 @@ pwd   # must point to repository root
 
 The edge layer uses three local environment files:
 
-* `env/common.env` (shared across frameworks)
-* `env/mediapipe.env` (MediaPipe-specific)
-* `env/openpose.env` (OpenPose-specific)
+* `src/env/common.env` (shared across frameworks)
+* `src/env/mediapipe.env` (MediaPipe-specific)
+* `src/env/openpose.env` (OpenPose-specific)
 
-Only `env/common.env` must be created manually.
+Only `src/env/common.env` must be created manually.
 
 Create it by copying the example file:
 
 ```bash
-cp env/common.env.example env/common.env
+cp src/env/common.env.example src/env/common.env
 ```
 
-Open `env/common.env` and set at least:
+Open `src/env/common.env` and set at least:
 
 * `INGEST_URL` — HTTPS endpoint of the Cloud Run ingestion API including `/metrics`
 * `SOURCE_NAME` — human-readable identifier for this run (appears in all stored metrics)
@@ -369,7 +369,7 @@ Copy the `.task` file into the MediaPipe extraction module:
 src/extract_pose_mediapipe/pose_landmarker_heavy.task
 ```
 
-The path is referenced via environment variables inside `env/mediapipe.env`.
+The path is referenced via environment variables inside `src/env/mediapipe.env`.
 If the file is missing or misnamed, the MediaPipe container will fail at startup.
 
 No model download occurs at runtime. This is intentional to ensure reproducibility and offline execution.
@@ -438,7 +438,7 @@ gcloud run services add-iam-policy-binding ingestion-api \
 The key **must** be written directly into the expected secrets path:
 
 ```bash
-gcloud iam service-accounts keys create env/secrets/edge-ingestor-key.json \
+gcloud iam service-accounts keys create src/env/secrets/edge-ingestor-key.json \
   --project=clc-group-vision-2026 \
   --iam-account=edge-ingestor@clc-group-vision-2026.iam.gserviceaccount.com
 ```
@@ -446,11 +446,11 @@ gcloud iam service-accounts keys create env/secrets/edge-ingestor-key.json \
 Expected local path:
 
 ```text
-env/secrets/edge-ingestor-key.json
+src/env/secrets/edge-ingestor-key.json
 ```
 
 Docker Compose mounts this file into the container.
-`env/common.env` sets `GOOGLE_APPLICATION_CREDENTIALS` to the in-container path.
+`src/env/common.env` sets `GOOGLE_APPLICATION_CREDENTIALS` to the in-container path.
 
 ---
 
