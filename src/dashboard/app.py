@@ -1,138 +1,131 @@
-import os
 import streamlit as st
 from google.cloud import firestore
 import pandas as pd
-import google.auth
+import plotly.express as px
+import plotly.graph_objects as go
+import os
 
+# Setup Page
 st.set_page_config(page_title="CLC Vision Benchmark", layout="wide")
 
-st.title("🏋️ CLC Group: Computer Vision Benchmark")
-st.caption("Data source: Google Cloud Firestore")
-
-# ----------------------------
-# Firestore connection (Cloud Run friendly)
-# ----------------------------
 @st.cache_resource
 def get_db():
-    project = (
-        os.getenv("GOOGLE_CLOUD_PROJECT")
-        or google.auth.default()[1]
-    )
-    database = os.getenv("FIRESTORE_DATABASE", "clc-group-vision-2026")
-
+    # Ensure your service account or gcloud auth is set up for this project
+    database = os.getenv("FIRESTORE_DATABASE")
+    project = os.getenv("GOOGLE_CLOUD_PROJECT")
     return firestore.Client(project=project, database=database)
 
 db = get_db()
 
-# ----------------------------
-# Controls
-# ----------------------------
-st.subheader("Live Metrics Feed")
+st.title("🏋️ CLC Group: Vision Pipeline Benchmark")
 
-c1, c2, c3, c4 = st.columns([1, 1, 1, 2])
-
-limit = c1.selectbox("Limit", [50, 100, 250], index=1)
-
-model_filter = c2.selectbox(
-    "Model",
-    ["(all)", "mediapipe_pose", "openpose_pose"],
-    index=0,
-)
-
-type_filter = c3.selectbox(
-    "Type",
-    ["(all)", "video_ok", "video_error", "run_end"],
-    index=0,
-)
-
-refresh = c4.button("🔄 Refresh data")
-
-# ----------------------------
-# Fetch + cache (only refreshes when you click)
-# ----------------------------
-@st.cache_data
-def fetch_metrics(limit: int):
-    q = (
-        db.collection("metrics")
-        .order_by("ts_utc", direction=firestore.Query.DESCENDING)
-        .limit(limit)
-    )
-    docs = q.stream()
-    rows = []
+# --- DATA FETCHING ---
+def load_data():
+    docs = db.collection("metrics").stream()
+    data = []
     for doc in docs:
         d = doc.to_dict()
-        d["_id"] = doc.id
-        rows.append(d)
-    return rows
+        data.append(d)
+    return pd.DataFrame(data)
 
-if refresh:
-    fetch_metrics.clear()
+df = load_data()
 
-data = fetch_metrics(limit)
+if not df.empty:
+    # --- 1. TOP LEVEL KPIS ---
+    for model in df['model'].unique():
+        st.subheader(f"Metrics: {model}")
+        m1, m2, m3, m4 = st.columns(4)
+        
+        # Filter dataframe for the specific model
+        model_df = df[df['model'] == model]
+        
+        m1.metric("Total Runs", len(model_df))
+        m2.metric("Median Latency", f"{model_df['infer_lat_median_ms'].median():.1f}ms")
+        m3.metric("Avg Visibility", f"{model_df['mean_visibility'].mean()*100:.1f}%")
+        m4.metric("Peak RSS Memory", f"{model_df['rss_peak_mb'].max():.0f} MB")
 
-if not data:
-    st.warning("No data found in Firestore collection 'metrics'.")
-    st.stop()
+    st.divider()
 
-df = pd.DataFrame(data)
+    # --- 2. LATENCY & PERFORMANCE ---
+    col_left, col_right = st.columns(2)
 
-# ----------------------------
-# Apply filters (safe)
-# ----------------------------
-if model_filter != "(all)" and "model" in df.columns:
-    df = df[df["model"] == model_filter]
+    with col_left:
+        st.subheader("Latency Distribution (p50, p90, p99)")
+        # Creating a box plot to show the spread of latency
+        fig_lat = px.box(df, x="label", y=["infer_lat_median_ms", "infer_lat_p90_ms", "infer_lat_p99_ms"],
+                         title="Inference Latency by Exercise Type",
+                         labels={"value": "Time (ms)", "variable": "Percentile"})
+        st.plotly_chart(fig_lat, use_container_width=True)
 
-if type_filter != "(all)" and "type" in df.columns:
-    df = df[df["type"] == type_filter]
+    with col_right:
+        st.subheader("🎯 CONFIDENCE (LATEST)")
+        
+        # Group to get the latest visibility per model
+        latest_metrics = df.groupby('model').first()
+        num_models = len(latest_metrics)
+        
+        if num_models > 0:
+            fig_gauge = go.Figure()
 
-# Coerce numeric columns (safe)
-for c in ["eff_fps", "wall_s", "detect_rate", "mean_visibility", "nan_rate_xyz", "mem_mb_delta"]:
-    if c in df.columns:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
+            # The 'domain' for all gauges must fit between 0 and 1
+            # We calculate height per gauge and add a small padding (spacing)
+            spacing = 0.05
+            available_height = 1.0 - (spacing * (num_models - 1))
+            height_per_gauge = available_height / num_models
 
-# ----------------------------
-# KPI Row
-# ----------------------------
-k1, k2, k3, k4 = st.columns(4)
-k1.metric("Videos loaded", len(df))
+            for i, (model_name, row) in enumerate(latest_metrics.iterrows()):
+                # Calculate the exact Y coordinates for this specific gauge
+                # We iterate from bottom (0) to top (1)
+                y_bottom = i * (height_per_gauge + spacing)
+                y_top = y_bottom + height_per_gauge
+                
+                # Double-check: Plotly crashes if y_top > 1.0 due to float rounding
+                y_top = min(y_top, 1.0)
+                
+                fig_gauge.add_trace(go.Indicator(
+                    mode = "gauge+number",
+                    value = row['mean_visibility'] * 100,
+                    title = {'text': str(model_name).upper(), 'font': {'size': 14}},
+                    domain = {'x': [0, 1], 'y': [y_bottom, y_top]},
+                    gauge = {
+                        'bar': {'color': "#00ff41"},
+                        'axis': {'range': [0, 100]}
+                    }
+                ))
 
-if "type" in df.columns:
-    ok = int((df["type"] == "video_ok").sum())
-    err = int((df["type"] == "video_error").sum())
-    k2.metric("video_ok", ok)
-    k3.metric("video_error", err)
+            fig_gauge.update_layout(
+                template="plotly_dark", 
+                # Adjust total widget height so gauges don't look squashed
+                height=250 * num_models if num_models > 1 else 300,
+                margin=dict(l=30, r=30, t=50, b=30)
+            )
+            st.plotly_chart(fig_gauge, use_container_width=True)
+        else:
+            st.info("No confidence data available.")
+
+    # --- 3. RESOURCE & QUALITY ---
+    col_a, col_b = st.columns(2)
+
+    with col_a:
+        st.subheader("Memory Leak Analysis")
+        # Tracking memory growth (Start vs End)
+        fig_mem = go.Figure()
+        fig_mem.add_trace(go.Bar(name='Start RAM', x=df.index, y=df['mem_mb_start']))
+        fig_mem.add_trace(go.Bar(name='End RAM', x=df.index, y=df['mem_mb_end']))
+        fig_mem.update_layout(barmode='group', title="Memory Consumption (Start vs End MB)")
+        st.plotly_chart(fig_mem, use_container_width=True)
+
+    with col_b:
+        st.subheader("Data Quality (Visibility)")
+        # Histogram of landmark visibility
+        fig_vis = px.histogram(df, x="mean_visibility", nbins=20, 
+                               color_discrete_sequence=['indianred'],
+                               title="Landmark Visibility Distribution")
+        st.plotly_chart(fig_vis, use_container_width=True)
+
+    # --- 4. RAW DATA ---
+    with st.expander("View Raw Metrics Table"):
+        st.dataframe(df.sort_values("ts_utc", ascending=False))
+
 else:
-    k2.metric("video_ok", "—")
-    k3.metric("video_error", "—")
-
-if "eff_fps" in df.columns and df["eff_fps"].notna().any():
-    k4.metric("Avg eff_fps", f"{df['eff_fps'].mean():.2f}")
-else:
-    k4.metric("Avg eff_fps", "—")
-
-st.markdown("---")
-
-# ----------------------------
-# Table
-# ----------------------------
-st.dataframe(
-    df.sort_values(by="ts_utc", ascending=False) if "ts_utc" in df.columns else df,
-    use_container_width=True,
-)
-
-# ----------------------------
-# Simple chart: eff_fps by label (video_ok only)
-# ----------------------------
-if "eff_fps" in df.columns and "label" in df.columns:
-    chart_df = df.copy()
-    if "type" in chart_df.columns:
-        chart_df = chart_df[chart_df["type"] == "video_ok"]
-
-    if not chart_df.empty:
-        agg = (
-            chart_df.groupby("label", as_index=False)["eff_fps"]
-            .mean()
-            .sort_values("eff_fps", ascending=False)
-        )
-        st.subheader("Mean eff_fps by label (video_ok)")
-        st.bar_chart(agg, x="label", y="eff_fps")
+    st.warning("No data found in Firestore 'metrics' collection.")
