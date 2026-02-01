@@ -1,20 +1,5 @@
 # Cloud-Native CV Benchmarking Platform
 
-Nachfolgend **der vollständige, ersetzbare README-Text** mit:
-
-* **Cloud vor Edge** (logisch korrekt für Key/INGEST_URL),
-* **vereinheitlichter Sprache**,
-* **reduzierten Redundanzen** (ohne Informationsverlust),
-* **allen Commands unverändert erhalten**,
-* **allen bestehenden Quellen-URLs unverändert**,
-* **Struktur beibehalten** (nur sauber konsolidiert, doppelte Cloud-Abschnitte entfernt).
-
-Du kannst den bestehenden README **1:1 ersetzen**.
-
----
-
-# Cloud-Native CV Benchmarking Platform
-
 ## Abstract
 
 This project presents a cloud-native, event-driven benchmarking platform for pose-estimation systems operating in edge-to-cloud environments. The platform decouples local computer vision inference from cloud-side aggregation and visualization, enabling realistic performance evaluation without transmitting raw video data. By combining containerized edge execution with managed cloud services, the system provides a reproducible and framework-agnostic basis for comparing runtime performance, resource usage, and detection quality across different pose-estimation frameworks. The architecture emphasizes separation of concerns, least-privilege security, and configuration-driven reproducibility, making it suitable both as a research artifact and as a reference implementation for edge–cloud computer vision pipelines.
