@@ -117,7 +117,7 @@ All components are configured exclusively via environment variables. Configurati
 
 ### Configuration Scopes
 
-* **Edge (Docker):** `src/src/env/common.env`, `src/src/env/mediapipe.env`, `src/src/env/openpose.env`
+* **Edge (Docker):** `src/env/common.env`, `src/env/mediapipe.env`, `src/env/openpose.env`
 * **Cloud:** injected at deploy time via `gcloud --set-env-vars`
 
 ### Required Variables
