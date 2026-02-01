@@ -60,10 +60,7 @@ Edge Client → Ingestion API → Pub/Sub → Cloud Worker → Firestore → Das
 
 ```mermaid
 flowchart LR
-  A["Edge Client<br/>Docker: MediaPipe / OpenPose"]
-    -->|"HTTP POST /metrics<br/>(JSON metrics)"|
-  B["Ingestion API<br/>Cloud Run (FastAPI)"]
-
+  A["Edge Client<br/>Docker: MediaPipe / OpenPose"] -->|"HTTP POST /metrics<br/>(JSON metrics)"| B["Ingestion API<br/>Cloud Run (FastAPI)"]
   B -->|"publish event"| C["Pub/Sub Topic<br/>cv-metrics-topic"]
   C -->|"trigger"| D["Cloud Function (Gen2)<br/>Worker"]
   D -->|"write"| E["Firestore<br/>Native mode"]
