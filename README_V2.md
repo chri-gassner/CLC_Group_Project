@@ -497,6 +497,37 @@ Docker Compose mounts this file into the container.
 
 Each edge container run is fully self-contained. Cloud-side failures do not interrupt local inference. Containers can be stopped and restarted safely.
 
+#### Input Data Layout (Required)
+
+The edge containers expect a **pose-wise directory structure** under `data/`.
+Each subdirectory corresponds to **one exercise / pose class** and contains raw video files.
+
+```
+src/
+└── data/
+    ├── squat/
+    │   ├── squat_01.mp4
+    │   ├── squat_02.mp4
+    │   └── ...
+    ├── deadlift/
+    │   ├── deadlift_01.mp4
+    │   └── ...
+    ├── bench_press/
+    │   └── bench_01.mp4
+    └── ...
+```
+
+**Rules**
+- One folder = one pose / exercise label
+- Folder name is interpreted as the **ground-truth class label**
+- Supported formats: `.mp4`, `.mov`, `.avi`
+- No nested subfolders below the pose level
+
+**Mounting Behavior**
+- The full `data/` directory is mounted **read-only** into the container
+- Paths inside the container must not be modified
+
+
 #### MediaPipe
 
 ```bash
