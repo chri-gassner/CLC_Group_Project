@@ -60,11 +60,25 @@ Edge Client → Ingestion API → Pub/Sub → Cloud Worker → Firestore → Das
 
 ```mermaid
 flowchart LR
-  A["Edge Client<br/>Docker: MediaPipe / OpenPose"] -->|"HTTP POST /metrics<br/>(JSON metrics)"| B["Ingestion API<br/>Cloud Run (FastAPI)"]
-  B -->|"publish event"| C["Pub/Sub Topic<br/>cv-metrics-topic"]
-  C -->|"trigger"| D["Cloud Function (Gen2)<br/>Worker"]
-  D -->|"write"| E["Firestore<br/>Native mode"]
-  E -->|"read"| F["Dashboard<br/>Streamlit"]
+  subgraph EDGE["Edge (local, no video upload)"]
+    A["Pose Extractor<br/>Docker: MediaPipe / OpenPose<br/>Outputs: JSON metrics"]
+  end
+
+  subgraph CLOUD["Cloud (managed, stateless services)"]
+    B["Ingestion API<br/>Cloud Run (FastAPI)<br/>Validate + Publish"]
+    C["Pub/Sub Topic<br/>cv-metrics-topic<br/>Queue / Decoupling"]
+    D["Worker<br/>Cloud Functions Gen2<br/>Persist"]
+    E["Firestore<br/>Native mode<br/>Metrics store"]
+    F["Dashboard<br/>Cloud Run (Streamlit)<br/>Read-only analytics"]
+  end
+
+  A -->|"HTTPS POST /metrics<br/>(JSON metrics)"| B
+  B -->|"Pub/Sub message"| C
+  C -->|"event trigger"| D
+  D -->|"write documents"| E
+  E -->|"query metrics"| F
+
+  A -.->|"Auth: Identity Token<br/>(service account key on edge)"| B
 ```
 
 Each component has a single responsibility. Edge containers never access cloud databases, and cloud services never perform inference.
