@@ -162,6 +162,7 @@ def get_env_info() -> Dict[str, Any]:
         "hostname": socket.gethostname(),
         "os": platform.platform(),
         "python": platform.python_version(),
+        "model": "mediapipe_pose",
         "fps_target": FPS_TARGET,
         "model_path": MODEL_PATH,
         "mediapipe": getattr(mp, "__version__", "unknown"),
@@ -508,6 +509,7 @@ def main() -> None:
 
             rec: Dict[str, Any] = {
                 "type": "video_ok",
+                "model": "mediapipe_pose",
                 "source": SOURCE_NAME,
                 "ts_utc": now_iso(),
                 "video_path": video_path,
