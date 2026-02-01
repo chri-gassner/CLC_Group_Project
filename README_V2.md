@@ -1,5 +1,7 @@
 # Cloud-Native CV Benchmarking Platform
 
+Group: Bindreiter Simon, Gassner Christoph, Sarkady Marco
+
 ## Abstract
 
 This project presents a cloud-native, event-driven benchmarking platform for pose-estimation systems operating in edge-to-cloud environments. The platform decouples local computer vision inference from cloud-side aggregation and visualization, enabling realistic performance evaluation without transmitting raw video data. By combining containerized edge execution with managed cloud services, the system provides a reproducible and framework-agnostic basis for comparing runtime performance, resource usage, and detection quality across different pose-estimation frameworks. The architecture emphasizes separation of concerns, least-privilege security, and configuration-driven reproducibility, making it suitable both as a research artifact and as a reference implementation for edge–cloud computer vision pipelines.
