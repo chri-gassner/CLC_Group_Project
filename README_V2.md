@@ -493,11 +493,7 @@ Docker Compose mounts this file into the container.
 
 ---
 
-### Running Edge Containers
-
-Each edge container run is fully self-contained. Cloud-side failures do not interrupt local inference. Containers can be stopped and restarted safely.
-
-#### Input Data Layout (Required)
+### Input Data Layout (Required)
 
 The edge containers expect a **pose-wise directory structure** under `data/`.
 Each subdirectory corresponds to **one exercise / pose class** and contains raw video files.
@@ -528,6 +524,10 @@ src/
 - Paths inside the container must not be modified
 
 ---
+
+### Running Edge Containers
+
+Each edge container run is fully self-contained. Cloud-side failures do not interrupt local inference. Containers can be stopped and restarted safely.
 
 #### MediaPipe
 
