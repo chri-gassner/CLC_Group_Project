@@ -575,9 +575,9 @@ Path Management via Volume Mounts: Proper configuration of Volume Mounts is vita
 4. Protobuf Versioning & Dependency Isolation
 Managing Dependency Conflicts: We encountered significant "Dependency Hell" because MediaPipe requires older versions of protobuf, while the Google Cloud client libraries require the latest versions.
 
-The Microservices Solution: 
-
+**The Microservices Solution**: 
 Decoupling the Edge Client from the Backend into separate virtual environments or Docker containers was the only viable way to resolve these conflicts without breaking core functionality.
+
 ---
 
 ## Limitations
