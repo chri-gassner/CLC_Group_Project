@@ -1,0 +1,30 @@
+# docker-compose.mediapipe.yml
+services:
+  mediapipe_extract_pose:
+    platform: linux/amd64
+
+    build:
+      # Build context is the repo root (3 levels up from this compose file)
+      context: ../../..
+      dockerfile: src/extract_pose_mediapipe/docker/Dockerfile
+
+    # Optional: explicit tag for the locally built image
+    image: pose-extract:latest
+
+    # Shared config (project/ingest/auth/runtime) + MediaPipe-specific overrides
+    env_file:
+      - ../../env/common.env
+      - ../../env/mediapipe.env
+
+    volumes:
+      # Input dataset (read-only)
+      - ../../../src/data:/app/src/data:ro
+
+      # Persist outputs on host
+      - ../../../src/output:/app/src/output
+
+      # MediaPipe model file (.task) mounted read-only
+      - ../pose_landmarker_heavy.task:/app/src/extract_pose_mediapipe/pose_landmarker_heavy.task:ro
+
+      # GCP service account key (mounted at runtime, not baked into the image)
+      - ../../env/secrets/edge-ingestor-key.json:/run/secrets/gcp_sa.json:ro

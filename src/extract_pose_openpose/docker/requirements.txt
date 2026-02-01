@@ -1,0 +1,10 @@
+numpy>=1.23
+psutil>=5.9
+tqdm>=4.66
+requests>=2.31
+opencv-python-headless>=4.8
+requests
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+pandas
