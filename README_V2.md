@@ -176,7 +176,6 @@ Stateless FastAPI service that validates metrics and publishes them to Pub/Sub.
 | ---------------------- | ----------------------- |
 | `GOOGLE_CLOUD_PROJECT` | `clc-group-vision-2026` |
 
----
 
 #### Deploy
 
