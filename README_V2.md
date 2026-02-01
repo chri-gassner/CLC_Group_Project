@@ -557,8 +557,6 @@ from the same directory.
 
 ## Security Model
 
-This section summarizes how authentication, authorization, and secret handling are implemented across the platform, with a strict focus on least-privilege and separation of concerns.
-
 Authentication between edge and cloud is based on Google Cloud service accounts. Edge containers authenticate to the ingestion API using short-lived identity tokens derived from a mounted service account key. No static API keys or hard-coded credentials are used. Cloud-side services authenticate implicitly via their attached runtime identities.
 
 Authorization is scoped per component. Edge clients are granted only the `roles/run.invoker` permission on the ingestion API and have no access to Pub/Sub, Firestore, or other cloud resources. The ingestion API can publish messages to Pub/Sub but cannot write to Firestore. The worker can write to Firestore but cannot be invoked directly. The dashboard has read-only access to Firestore and no permissions to modify data or receive events.
