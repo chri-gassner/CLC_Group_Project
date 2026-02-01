@@ -76,9 +76,11 @@ Each component has a single responsibility. Edge containers never access cloud d
 ### Core Principles
 
 **Event-driven communication**
+
 All edge-to-cloud communication is asynchronous. Edge containers emit self-contained metric events that are processed independently by cloud services.
 
 **Stateless services**
+
 All cloud services are stateless. Persistent state is handled exclusively by managed services.
 
 **Separation of concerns**
@@ -89,9 +91,11 @@ All cloud services are stateless. Persistent state is handled exclusively by man
 * Dashboard: read-only visualization
 
 **Environment-based configuration**
+
 All configuration is injected via environment variables. No values are hard-coded into images or source code.
 
 **Reproducibility by construction**
+
 Containerized execution, fixed architectural constants, and explicit configuration boundaries ensure repeatable experiments.
 
 ---
