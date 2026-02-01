@@ -9,26 +9,28 @@ This project presents a cloud-native, event-driven benchmarking platform for pos
 ---
 
 ## Research Context and Motivation
+This project builds upon existing research in distributed computer vision and event-driven architectures. Our platform addresses the "Edge-to-Cloud" data gap by implementing a decoupled, scalable pipeline.
 
-This project builds upon existing research in distributed computer vision and event-driven architectures. The platform addresses the edge-to-cloud data gap by implementing a decoupled, scalable pipeline.
+1. Edge vs. Cloud Trade-offs in Real-time AI
+Research consistently highlights that while Cloud AI offers superior computational resources, it suffers from network latency and bandwidth costs. Conversely, Edge computing excels in real-time processing and data privacy.
 
-### Edge vs. Cloud Trade-offs in Real-time AI
+Key Finding: Hybrid models that use the edge for inference and the cloud for analytical aggregation (as seen in this project) offer the most balanced performance for IoT-scale deployments.
 
-Research consistently highlights that while Cloud AI offers superior computational resources, it suffers from network latency and bandwidth costs. Conversely, edge computing excels in real-time processing and data privacy.
+Source: [Benchmarking Edge Computing vs. Cloud Computing for Real-Time Data Processing (2025)](https://www.researchgate.net/publication/389356968_Benchmarking_Edge_Computing_vs_Cloud_Computing_for_Real-Time_Data_Processing)
 
-**Key Finding:** Hybrid models that perform inference at the edge and analytical aggregation in the cloud provide the best trade-off for IoT-scale deployments.
+2. Event-Driven Architectures for Real-Time Analytics
+Modern IoT systems are moving away from direct database writes to Event-Driven Architectures (EDA). By using a message broker (like Pub/Sub) to decouple producers from consumers, systems achieve higher fault tolerance and scalability.
 
-Source:
-[Benchmarking Edge Computing vs. Cloud Computing for Real-Time Data Processing (2025)](https://www.researchgate.net/publication/389356968_Benchmarking_Edge_Computing_vs_Cloud_Computing_for_Real-Time_Data_Processing)
+Key Finding: Decoupling ensures that high-frequency telemetry from edge devices does not overwhelm the backend. Asynchronous communication allows the system to handle bursty workloads while maintaining a responsive user dashboard.
 
-### Event-Driven Architectures for Real-Time Analytics
+Source: [Event-Driven Architectures for Real-Time Data Processing: A Deep Dive (2025)](https://www.researchgate.net/publication/391633680_Event-Driven_Architectures_for_Real-Time_Data_Processing_A_Deep_Dive_into_System_Design_and_Optimization)
 
-Modern IoT systems increasingly rely on event-driven architectures (EDA) instead of synchronous database writes. Message brokers decouple producers from consumers, improving fault tolerance and scalability.
+3. Cloud-Native Benchmarking Automation
+Traditional benchmarking is often manual and error-prone. Modern research suggests using "Benchmarking Operators" and containerized cloud-native environments to automate the collection of metrics across distributed nodes.
 
-**Key Finding:** Asynchronous communication prevents high-frequency telemetry from overwhelming backend services and enables responsive dashboards under bursty workloads.
+Key Finding: Separating the ingestion (API) from the processing (Worker) ensures that the benchmarking system itself does not become a bottleneck for the edge devices, preserving the integrity of the performance data.
 
-Source:
-[Event-Driven Architectures for Real-Time Data Processing: A Deep Dive (2025)](https://www.researchgate.net/publication/391633680_Event-Driven_Architectures_for_Real-Time_Data_Processing_A_Deep_Dive_into_System_Design_and_Optimization)
+Source: [Cloud-Native-Bench: An Extensible Benchmarking Framework (2024)](https://ieeexplore.ieee.org/document/10490079)
 
 ---
 
