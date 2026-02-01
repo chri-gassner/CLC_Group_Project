@@ -60,26 +60,39 @@ Edge Client → Ingestion API → Pub/Sub → Cloud Worker → Firestore → Das
 
 ```mermaid
 flowchart LR
-  subgraph EDGE["Edge (local, no video upload)"]
-    A["Pose Extractor<br/>Docker: MediaPipe / OpenPose<br/>Outputs: JSON metrics"]
+  subgraph EDGE["Edge (scalable producers, no video upload)"]
+    subgraph MP["MediaPipe Pose Extractors (N×)"]
+      MP1["MediaPipe Container<br/>PoseLandmarker (.task)<br/>Emit JSON metrics"]
+    end
+
+    subgraph OP["OpenPose Extractors (N×)"]
+      OP1["OpenPose Container<br/>CPU-only binary<br/>Emit JSON metrics"]
+    end
+
+    X["Edge Metrics Fan-in<br/>(multiple containers → events)"]
+
+    MP1 --> X
+    OP1 --> X
   end
 
-  subgraph CLOUD["Cloud (managed, stateless services)"]
+  subgraph CLOUD["Cloud (managed, async consumers)"]
     B["Ingestion API<br/>Cloud Run (FastAPI)<br/>Validate + Publish"]
     C["Pub/Sub Topic<br/>cv-metrics-topic<br/>Queue / Decoupling"]
     D["Worker<br/>Cloud Functions Gen2<br/>Persist"]
     E["Firestore<br/>Native mode<br/>Metrics store"]
-    F["Dashboard<br/>Cloud Run (Streamlit)<br/>Read-only analytics"]
+    F["Dashboard<br/>Streamlit (Cloud Run)<br/>Read-only analytics"]
   end
 
-  A -->|"HTTPS POST /metrics<br/>(JSON metrics)"| B
+  X -->|"HTTPS POST /metrics<br/>(JSON metrics)"| B
   B -->|"Pub/Sub message"| C
   C -->|"event trigger"| D
   D -->|"write documents"| E
   E -->|"query metrics"| F
 
-  A -.->|"Auth: Identity Token<br/>(service account key on edge)"| B
+  X -.->|"Auth: Identity Token<br/>(SA key on edge; roles/run.invoker)"| B
 ```
+Note: “N×” indicates that multiple extractor containers (MediaPipe and/or OpenPose) can run in parallel across machines and publish metrics to the same ingestion endpoint.
+
 
 Each component has a single responsibility. Edge containers never access cloud databases, and cloud services never perform inference.
 
