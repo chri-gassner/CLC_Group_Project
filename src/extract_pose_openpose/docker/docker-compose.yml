@@ -1,0 +1,24 @@
+# docker-compose.openpose.yml
+services:
+  openpose-cpu:
+    platform: linux/amd64
+
+    build:
+      # Build context is the repo root (3 levels up from this compose file)
+      context: ../../..
+      dockerfile: src/extract_pose_openpose/docker/Dockerfile
+
+    # Shared config (project/ingest/auth/runtime) + OpenPose-specific overrides
+    env_file:
+      - ../../env/common.env
+      - ../../env/openpose.env
+
+    volumes:
+      # Input dataset (read-only)
+      - ../../../src/data:/app/src/data:ro
+
+      # Persist outputs on host
+      - ../../../src/output/openpose:/output
+
+      # GCP service account key (mounted at runtime, not baked into the image)
+      - ../../env/secrets/edge-ingestor-key.json:/run/secrets/gcp_sa.json:ro
