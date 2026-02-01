@@ -84,7 +84,7 @@ METRICS_DIR.mkdir(parents=True, exist_ok=True)
 RUN_LOG = METRICS_DIR / f"openpose_run_{RUN_ID}.jsonl"
 RUN_SUMMARY = METRICS_DIR / f"openpose_summary_{RUN_ID}.csv"
 
-SOURCE_NAME = os.environ.get("SOURCE_NAME", "Christoph")
+SOURCE_NAME = os.environ.get("SOURCE_NAME", "client_openpose")
 
 # OpenPose
 OPENPOSE_BIN = os.environ.get("OPENPOSE_BIN", "/openpose/build/examples/openpose/openpose.bin")
