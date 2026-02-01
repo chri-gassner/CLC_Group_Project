@@ -355,6 +355,7 @@ Download the official MediaPipe Pose Landmarker model:
 * Source: [https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task](https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task)
 
 + Information: [https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker?hl=de#models](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker?hl=de#models)
+
 Recommended file:
 
 ```
