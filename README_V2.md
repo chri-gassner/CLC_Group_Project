@@ -527,6 +527,7 @@ src/
 - The full `data/` directory is mounted **read-only** into the container
 - Paths inside the container must not be modified
 
+---
 
 #### MediaPipe
 
