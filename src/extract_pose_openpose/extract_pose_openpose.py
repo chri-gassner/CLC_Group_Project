@@ -349,7 +349,9 @@ def run_openpose_on_video(video_path: str, label: Any) -> Dict[str, Any]:
         "--write_json", str(out_dir),
         "--display", "0",
         "--render_pose", "0",
+        "--net_resolution", "160x80",
         "--number_people_max", str(NUMBER_PEOPLE_MAX),
+        "--profile_speed","999"
     ]
     if MODEL_VARIANT.lower() == "coco":
         cmd += ["--model_pose", "COCO"]
@@ -432,6 +434,30 @@ def run_openpose_on_video(video_path: str, label: Any) -> Dict[str, Any]:
     json_files = sorted(glob.glob(str(out_dir / "*.json")))
     num_frames = int(len(json_files))
 
+    json_files = sorted(glob.glob(str(out_dir / "*.json")))
+    num_frames = int(len(json_files))
+
+    # --- INSERT START ---
+    actual_model_lat = None
+    if err:
+        for line in err.splitlines():
+            if "ms / frame" in line:
+                try:
+                    parts = line.split()
+                    # Finds the number immediately preceding "ms"
+                    actual_model_lat = float(parts[parts.index("ms") - 1])
+                    break
+                except (ValueError, IndexError):
+                    continue
+    
+    # Use parsed latency if found; fallback to wall-clock average
+    lat_val = actual_model_lat if actual_model_lat else (wall_s / max(1, num_frames)) * 1000
+    lat_stats = summarize_latencies_ms([lat_val] if num_frames > 0 else [])
+    # --- INSERT END ---
+
+    # Parse detection + confidence stats
+    detected_frames = 0
+
     # Parse detection + confidence stats
     detected_frames = 0
     confs: List[float] = []
@@ -466,7 +492,7 @@ def run_openpose_on_video(video_path: str, label: Any) -> Dict[str, Any]:
     eff_fps = float(num_frames / wall_s) if (num_frames > 0 and wall_s > 0) else None
 
     # OpenPose has no per-frame infer latency list here
-    lat_stats = summarize_latencies_ms([])
+    #lat_stats = summarize_latencies_ms([])
 
     # Decide ok vs error based on return code and output presence
     if proc.returncode != 0:
