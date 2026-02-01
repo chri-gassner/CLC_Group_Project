@@ -76,7 +76,7 @@ INGEST_URL = os.environ.get("INGEST_URL", None)
 RUN_LOG = METRICS_DIR / f"pose_run_{RUN_ID}.jsonl"
 RUN_SUMMARY = METRICS_DIR / f"pose_summary_{RUN_ID}.csv"
 
-SOURCE_NAME = "client_mediapipe"
+SOURCE_NAME = os.environ.get("SOURCE_NAME", "client_mediapipe")
 
 if not INGEST_URL:
     print("Warning: INGEST_URL not set; API posting disabled.")
