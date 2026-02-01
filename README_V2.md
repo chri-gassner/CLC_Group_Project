@@ -69,6 +69,17 @@ flowchart LR
 
 Each component has a single responsibility. Edge containers never access cloud databases, and cloud services never perform inference.
 
+### Real-world Use Cases
+
+The platform is designed for scenarios where raw video must remain on-device, while performance and quality metrics are aggregated centrally:
+
+- **Edge hardware selection:** Compare FPS, CPU, and memory across devices to choose an appropriate edge target for pose inference.
+- **Regression benchmarking:** Detect performance and quality drift after updates to models, dependencies, or container images using repeatable benchmark runs.
+- **Privacy-first deployments:** Enable analytics in sensitive environments (e.g., healthcare, gyms, workplaces) without uploading video—only structured metrics leave the device.
+- **Multi-site comparability:** Aggregate metrics from multiple locations or machines via `SOURCE_NAME` to identify outliers and environment-dependent behavior.
+- **Framework/model selection:** Run apples-to-apples comparisons (MediaPipe vs. OpenPose, model variants) on the same dataset and metric schema.
+- **Resilience testing:** Evaluate system behavior under cloud slowdowns or network issues by observing event delays while edge inference remains unaffected.
+- - **Cost-aware preflight validation:** Use short benchmark runs to detect misconfigurations (e.g., missing models, wrong paths, invalid credentials) and unacceptable performance characteristics before launching long-running pose extraction jobs that would waste compute time and cloud resources.
 ---
 
 ## Design Principles
@@ -539,7 +550,9 @@ Path Management via Volume Mounts: Proper configuration of Volume Mounts is vita
 4. Protobuf Versioning & Dependency Isolation
 Managing Dependency Conflicts: We encountered significant "Dependency Hell" because MediaPipe requires older versions of protobuf, while the Google Cloud client libraries require the latest versions.
 
-The Microservices Solution: Decoupling the Edge Client from the Backend into separate virtual environments or Docker containers was the only viable way to resolve these conflicts without breaking core functionality.
+The Microservices Solution: 
+
+Decoupling the Edge Client from the Backend into separate virtual environments or Docker containers was the only viable way to resolve these conflicts without breaking core functionality.
 ---
 
 ## Limitations
