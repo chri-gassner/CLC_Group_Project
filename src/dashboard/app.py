@@ -1,5 +1,6 @@
 import streamlit as st
 from google.cloud import firestore
+from dotenv import load_dotenv
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -7,6 +8,12 @@ import os
 
 # Setup Page
 st.set_page_config(page_title="CLC Vision Benchmark", layout="wide")
+
+# Load environment variables
+from pathlib import Path
+    
+env_path = (Path(__file__).parent.parent / "src" / "env" / "common.env").resolve()
+load_dotenv(env_path)
 
 @st.cache_resource
 def get_db():

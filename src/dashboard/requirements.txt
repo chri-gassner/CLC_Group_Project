@@ -3,3 +3,4 @@ google-cloud-firestore
 pandas
 google-auth>=2.0.0
 plotly
+python-dotenv
